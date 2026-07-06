@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<!--
+  ARTIFACT TEMPLATE
+  1. Copy this file to artifact-02.html (03, 04, 05...).
+  2. Replace every {{ PLACEHOLDER }} below with your content.
+  3. Put your PDF + a *-cover.png in assets/artifacts/.
+  4. Add a matching card to artifacts.html (see README section 3).
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ ARTIFACT TITLE }} · Moya Kramo</title>
+  <meta name="description" content="{{ ONE-LINE DESCRIPTION }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html">
+        <span class="mark">MK</span>
+        <span>Moya Kramo<small>Data Science &amp; AI</small></span>
+      </a>
+      <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="artifacts.html" class="active">Artifacts</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <div class="detail">
+      <aside class="side-nav">
+        <a class="back" href="artifacts.html">&larr; Back to Artifacts</a>
+        <ul>
+          <li><a href="#introduction" class="active">Introduction</a></li>
+          <li><a href="#objective">Objective</a></li>
+          <li><a href="#document">The Document</a></li>
+          <li><a href="#process">Process</a></li>
+          <li><a href="#tools">Tools &amp; Technologies</a></li>
+          <li><a href="#value">Value Proposition</a></li>
+          <li><a href="#learnings">Key Learnings</a></li>
+        </ul>
+      </aside>
+
+      <div class="detail-main">
+        <header class="detail-header">
+          <div class="art-index">ARTIFACT {{ 02 }}</div>
+          <h1>{{ ARTIFACT TITLE }}</h1>
+          <div class="pills">
+            <span class="pill brand">{{ Tag 1 }}</span>
+            <span class="pill brand">{{ Tag 2 }}</span>
+            <span class="pill brand">{{ Tag 3 }}</span>
+          </div>
+          <p class="sub">{{ SHORT INTRO SENTENCE }}</p>
+          <div class="doc-actions">
+            <a class="btn btn-primary" href="#document">View &darr;</a>
+            <a class="btn btn-ghost" href="assets/artifacts/{{ YOUR-FILE }}.pdf" download>Download PDF</a>
+          </div>
+        </header>
+
+        <section class="art-section" id="introduction">
+          <h2>Introduction</h2>
+          <p>{{ INTRODUCTION }}</p>
+        </section>
+
+        <section class="art-section" id="objective">
+          <h2>Objective</h2>
+          <p>{{ OBJECTIVE }}</p>
+        </section>
+
+        <section class="art-section" id="document">
+          <h2>The Document</h2>
+          <iframe class="pdf-frame" src="assets/artifacts/{{ YOUR-FILE }}.pdf#view=FitH" title="{{ ARTIFACT TITLE }}"></iframe>
+          <p class="pdf-note">
+            If the viewer doesn't load,
+            <a href="assets/artifacts/{{ YOUR-FILE }}.pdf" style="color:var(--red-bright)">open the PDF in a new tab</a>.
+          </p>
+        </section>
+
+        <section class="art-section" id="process">
+          <h2>Process</h2>
+          <p>{{ PROCESS }}</p>
+        </section>
+
+        <section class="art-section" id="tools">
+          <h2>Tools &amp; Technologies</h2>
+          <p>{{ TOOLS }}</p>
+        </section>
+
+        <section class="art-section" id="value">
+          <h2>Value Proposition</h2>
+          <p>{{ VALUE PROPOSITION }}</p>
+        </section>
+
+        <section class="art-section" id="learnings">
+          <h2>Key Learnings</h2>
+          <ul>
+            <li>{{ Learning 1 }}</li>
+            <li>{{ Learning 2 }}</li>
+            <li>{{ Learning 3 }}</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div>&copy; 2026 Moya Kramo · Data Science &amp; AI</div>
+      <div><a href="artifacts.html">All artifacts</a> · <a href="index.html">Home</a></div>
+    </div>
+  </footer>
+
+  <script src="assets/main.js"></script>
+</body>
+</html>
