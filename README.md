@@ -23,10 +23,3 @@ portfolio/
 ```
 
 ---
-
-
-
-- Page links are **relative** (e.g. `artifact-01.html`), so the site works whether
-  it's at `/portfolio/` or anywhere else — no path surgery needed.
-- The `.nojekyll` file must stay in the repo; it prevents GitHub from hiding files
-  that start with an underscore and keeps everything served exactly as uploaded.
