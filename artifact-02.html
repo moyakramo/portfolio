@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyBridge: Building an AI Study Assistant · Moya Kramo</title>
+  <meta name="description" content="A working AI study assistant for graduate and online learners, designed with a human-centered framework, built on Chatbase, and tested against explicit academic-integrity boundaries." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html">
+        <span class="mark">MK</span>
+        <span>Moya Kramo<small>Data Science &amp; AI</small></span>
+      </a>
+      <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="artifacts.html" class="active">Artifacts</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <div class="detail">
+      <!-- SIDEBAR -->
+      <aside class="side-nav">
+        <a class="back" href="artifacts.html">&larr; Back to Artifacts</a>
+        <ul>
+          <li><a href="#introduction" class="active">Introduction</a></li>
+          <li><a href="#objective">Objective</a></li>
+          <li><a href="#assistant">The Assistant</a></li>
+          <li><a href="#document">Documentation</a></li>
+          <li><a href="#process">Process</a></li>
+          <li><a href="#tools">Tools &amp; Technologies</a></li>
+          <li><a href="#value">Value Proposition</a></li>
+          <li><a href="#learnings">Key Learnings</a></li>
+        </ul>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="detail-main">
+        <header class="detail-header">
+          <div class="art-index">ARTIFACT 02</div>
+          <h1>StudyBridge: Designing, Building, and Testing an AI Study Assistant</h1>
+          <div class="pills">
+            <span class="pill brand">Generative AI</span>
+            <span class="pill brand">Prompt Engineering</span>
+            <span class="pill brand">Design Thinking</span>
+          </div>
+          <p class="sub">
+            A working AI chatbot that coaches graduate and online learners through planning, understanding,
+            and studying, without doing their graded work for them. Designed with a human-centered framework,
+            built on Chatbase, and tested against explicit academic-integrity boundaries.
+          </p>
+          <div class="doc-actions">
+            <a class="btn btn-primary" href="https://www.chatbase.co/W1hpFMcUQwDGH7E_cpqnx/help" target="_blank" rel="noopener">Chat with StudyBridge &rarr;</a>
+            <a class="btn btn-ghost" href="assets/artifacts/AIML500_1.4_AI_Lab_Kramo.pdf" download>Download documentation</a>
+          </div>
+        </header>
+
+        <section class="art-section" id="introduction">
+          <h2>Introduction</h2>
+          <p>
+            This artifact is the product of a three-stage AI lab. The first stage was hands-on practice with
+            three categories of generative AI tools: a general large language model, a custom GPT, and STORM,
+            a Stanford research assistant. The second stage applied design thinking, a human-centered
+            problem-solving framework. The third stage combined both: planning, building, testing, and
+            iterating a live AI study assistant named StudyBridge, deployed as a shareable chatbot that
+            anyone can try. The full build documentation, including the system prompt and real test
+            transcripts, is embedded below.
+          </p>
+        </section>
+
+        <section class="art-section" id="objective">
+          <h2>Objective</h2>
+          <p>
+            To move from using AI tools to building one: translate a real user need into a working assistant
+            with a defined persona, an ordered interaction flow, and firm ethical boundaries, then verify
+            through testing that every rule holds up under pressure. The target users are working adult
+            learners who struggle less with course material and more with unclear next steps, rubric
+            confusion, and time management.
+          </p>
+        </section>
+
+        <section class="art-section" id="assistant">
+          <h2>The Assistant</h2>
+          <p>
+            StudyBridge is live. It greets students, states what it will and will not help with, and asks
+            three intake questions before advising. It breaks assignments into subtasks on a timeline,
+            suggests study techniques like active recall and spaced practice, and explains APA 7 formatting.
+            It refuses to write graded work, invent citations, or answer graded questions, and each of those
+            boundaries was tested directly.
+          </p>
+          <p>
+            <a href="https://www.chatbase.co/W1hpFMcUQwDGH7E_cpqnx/help" target="_blank" rel="noopener" style="color:var(--red-bright); font-weight:600;">Open StudyBridge in a new tab &rarr;</a>
+          </p>
+          <p class="pdf-note">
+            Note: StudyBridge runs on a free Chatbase plan with limited monthly message credits, so responses
+            may be unavailable if the quota is exhausted. The documentation below includes full transcripts of
+            its tested behavior.
+          </p>
+        </section>
+
+        <section class="art-section" id="document">
+          <h2>Documentation</h2>
+          <iframe class="pdf-frame" src="assets/artifacts/AIML500_1.4_AI_Lab_Kramo.pdf#view=FitH" title="AI Lab Guided Activities Documentation"></iframe>
+          <p class="pdf-note">
+            If the embedded viewer doesn't load on your device,
+            <a href="assets/artifacts/AIML500_1.4_AI_Lab_Kramo.pdf" style="color:var(--red-bright)">open the PDF in a new tab</a>.
+          </p>
+        </section>
+
+        <section class="art-section" id="process">
+          <h2>Process</h2>
+          <p>
+            Practiced with three generative AI tools and compared their behavior, including running one
+            structured prompt across three sessions to observe output variability. Applied the design
+            thinking sequence (empathy, define, ideate, prototype, test) to define the user, the problem
+            statement, and an ethical boundary: the assistant must never produce graded work. Answered ten
+            planning questions covering objective, knowledge, boundaries, tone, flow, and success criteria.
+            Reviewed the build platform's privacy statement and terms before deploying. Built the assistant
+            on Chatbase with a custom system prompt and a reference document, then ran one test scenario per
+            rule, tuned the instructions where behavior fell short, and retested until every boundary held.
+          </p>
+        </section>
+
+        <section class="art-section" id="tools">
+          <h2>Tools &amp; Technologies</h2>
+          <p>
+            Chatbase (chatbot build and deployment) · ChatGPT (prompt variability testing) · Universal Primer
+            custom GPT · STORM (Stanford research assistant) · System prompt design · Design thinking framework.
+          </p>
+        </section>
+
+        <section class="art-section" id="value">
+          <h2>Value Proposition</h2>
+          <p>
+            This artifact demonstrates the full lifecycle of a small AI product: identifying a real user need,
+            defining scope and ethical limits before writing a single instruction, encoding behavior in a
+            system prompt, and proving through adversarial testing that the guardrails work. For businesses
+            considering customer-facing AI assistants, the same discipline applies directly: a chatbot is only
+            as trustworthy as the boundaries it was designed and tested against. The live link lets any reader
+            verify the behavior themselves.
+          </p>
+        </section>
+
+        <section class="art-section" id="learnings">
+          <h2>Key Learnings</h2>
+          <ul>
+            <li>Instructions must be specific. Describing the goal was not enough; the assistant behaved reliably only after the steps were rewritten as an explicit sequence and the boundaries as firm rules.</li>
+            <li>Large language models are probabilistic, not deterministic. Identical prompts produce different outputs, so testing a prompt once proves very little.</li>
+            <li>Guardrails need adversarial tests. Each boundary was confirmed by trying to break it, including asking the assistant to write a graded post and to fabricate a citation.</li>
+            <li>Free tools carry real constraints. Reading the platform's terms surfaced message limits, content caps, and a deletion policy that shaped how the assistant was deployed and maintained.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div>&copy; 2026 Moya Kramo · Data Science &amp; AI</div>
+      <div><a href="artifacts.html">All artifacts</a> · <a href="index.html">Home</a></div>
+    </div>
+  </footer>
+
+  <script src="assets/main.js"></script>
+</body>
+</html>
