@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inside the Black Box: Neural Networks, Trust, and Measurement · Moya Kramo</title>
+  <meta name="description" content="An interactive tour of how neural networks make decisions: play with a working artificial neuron, meet the four core architectures, and see a practical framework for measuring AI systems you cannot see inside." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    /* Scoped styles for this artifact's components. Uses the site's design tokens. */
+    .detail-header h1 .accent {
+      background: var(--grad);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    /* --- neuron playground --- */
+    .playground {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; margin-top: 10px;
+      box-shadow: var(--shadow);
+    }
+    .playground canvas {
+      width: 100%; height: auto; display: block;
+      background: var(--bg-alt); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+    }
+    .pg-controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px 28px; margin-top: 20px; }
+    .pg-control label {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 13.5px; font-weight: 600; color: var(--muted); margin-bottom: 6px;
+      letter-spacing: .3px;
+    }
+    .pg-control label .pg-val { color: var(--red-bright); font-variant-numeric: tabular-nums; font-weight: 700; }
+    .pg-control input[type="range"] {
+      width: 100%; accent-color: var(--accent); cursor: pointer;
+    }
+    .pg-activations { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; align-items: center; }
+    .pg-activations .pg-lbl { font-size: 13.5px; font-weight: 600; color: var(--muted); margin-right: 4px; }
+    .pg-act-btn {
+      padding: 8px 18px; border-radius: 999px; font-size: 13.5px; font-weight: 600;
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--muted);
+      cursor: pointer; transition: .18s; font-family: var(--font);
+    }
+    .pg-act-btn:hover { color: var(--text); border-color: var(--accent); }
+    .pg-act-btn.active { background: var(--grad); color: #fff; border-color: transparent; }
+    .pg-act-desc { color: var(--muted-2); font-size: 13px; margin: 14px 0 0; }
+
+    /* --- architecture cards --- */
+    .arch-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 10px; }
+    .arch-card {
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius); padding: 26px 24px; transition: .2s;
+    }
+    .arch-card:hover { border-color: var(--border); transform: translateY(-3px); box-shadow: var(--shadow); }
+    .arch-card .arch-tag {
+      display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: 1.6px;
+      color: var(--red-bright); text-transform: uppercase; margin-bottom: 10px;
+    }
+    .arch-card h3 { margin: 0 0 12px; font-size: 1.12rem; letter-spacing: -.3px; }
+    .arch-card p { color: var(--muted); font-size: .93rem; margin: 0 0 10px; }
+    .arch-card p strong { color: var(--text); font-weight: 600; }
+    .arch-card p:last-child { margin-bottom: 0; }
+
+    /* --- measurement framework --- */
+    .metric-list { counter-reset: metric; margin-top: 6px; }
+    .metric {
+      display: flex; gap: 18px; align-items: flex-start;
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm); padding: 20px 22px; margin-bottom: 14px;
+    }
+    .metric .m-num {
+      counter-increment: metric; flex: none;
+      width: 34px; height: 34px; border-radius: 9px; background: var(--grad);
+      display: grid; place-items: center; font-weight: 800; font-size: 15px; color: #fff;
+    }
+    .metric .m-num::before { content: counter(metric); }
+    .metric h4 { margin: 2px 0 6px; font-size: 1rem; letter-spacing: -.2px; }
+    .metric p { color: var(--muted); font-size: .93rem; margin: 0; }
+
+    .callout {
+      background: var(--grad-soft); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 26px 28px; margin-top: 22px;
+    }
+    .callout p { margin: 0; color: var(--text); font-size: 1rem; }
+
+    @media (max-width: 860px) {
+      .pg-controls { grid-template-columns: 1fr; }
+      .arch-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html">
+        <span class="mark">MK</span>
+        <span>Moya Kramo<small>Data Science &amp; AI</small></span>
+      </a>
+      <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="artifacts.html" class="active">Artifacts</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <div class="detail">
+      <!-- SIDEBAR -->
+      <aside class="side-nav">
+        <a class="back" href="artifacts.html">&larr; Back to Artifacts</a>
+        <ul>
+          <li><a href="#introduction" class="active">Introduction</a></li>
+          <li><a href="#objective">Objective</a></li>
+          <li><a href="#playground">Neuron Playground</a></li>
+          <li><a href="#architectures">Four Architectures</a></li>
+          <li><a href="#trust">Trust &amp; Measurement</a></li>
+          <li><a href="#fieldguide">Field Guide</a></li>
+          <li><a href="#process">Process</a></li>
+          <li><a href="#tools">Tools &amp; Technologies</a></li>
+          <li><a href="#value">Value Proposition</a></li>
+          <li><a href="#learnings">Key Learnings</a></li>
+        </ul>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="detail-main">
+        <header class="detail-header">
+          <div class="art-index">ARTIFACT 03</div>
+          <h1>Inside the <span class="accent">Black Box</span>: Neural Networks, Trust, and How to Measure What You Cannot See</h1>
+          <div class="pills">
+            <span class="pill brand">Deep Learning</span>
+            <span class="pill brand">Interactive Visualization</span>
+            <span class="pill brand">AI Evaluation</span>
+          </div>
+          <p class="sub">
+            Neural networks power face recognition, fraud detection, and every modern chatbot, yet even the
+            people who build them cannot fully explain individual decisions. This artifact lets you operate
+            a working artificial neuron yourself, introduces the four core network architectures in plain
+            English, and lays out a practical framework for trusting systems whose reasoning you cannot inspect.
+          </p>
+          <div class="doc-actions">
+            <a class="btn btn-primary" href="#playground">Try the neuron playground &darr;</a>
+            <a class="btn btn-ghost" href="assets/artifacts/neural-networks-field-guide.pdf" download>Download the field guide</a>
+          </div>
+        </header>
+
+        <section class="art-section" id="introduction">
+          <h2>Introduction</h2>
+          <p>
+            Deep learning is the branch of machine learning behind the most visible AI breakthroughs of the
+            last decade. Its building block is surprisingly simple: an artificial neuron that multiplies its
+            inputs by weights, adds a bias, and passes the result through an activation function. Stack enough
+            of these together and the system can recognize a face or draft an email. It also becomes what
+            researchers call a black box: the inputs and outputs are observable, but the internal reasoning is
+            not easily interpretable, even by the people who built it.
+          </p>
+          <p>
+            That opacity is not a footnote. It is the central business problem of deep learning. This artifact
+            takes both halves seriously: first the mechanics, made tangible through an interactive widget and
+            plain-English architecture profiles, and then the harder question of how to trust and measure a
+            system you cannot see inside.
+          </p>
+        </section>
+
+        <section class="art-section" id="objective">
+          <h2>Objective</h2>
+          <p>
+            Three goals. First, make the core mechanism of deep learning something a visitor can feel with
+            their hands, not just read about, by building a working neuron simulator from scratch in plain
+            JavaScript. Second, give decision-makers a clear mental map of the four architectures they will
+            hear about most often (ANNs, CNNs, RNNs, and GANs) and where each one earns its keep in business
+            and finance. Third, answer a question raised by feedback on the previous artifact: how would you
+            actually measure whether an AI assistant works and deserves a user's trust?
+          </p>
+        </section>
+
+        <section class="art-section" id="playground">
+          <h2>Neuron Playground</h2>
+          <p>
+            This is a single artificial neuron, running live in your browser. Drag the sliders to change the
+            two inputs, the weight each input carries, and the bias. Switch between the three classic
+            activation functions and watch how the same inputs produce a different decision.
+          </p>
+
+          <div class="playground">
+            <canvas id="neuronCanvas" width="920" height="490" aria-label="Live diagram of an artificial neuron responding to the slider controls"></canvas>
+
+            <div class="pg-controls">
+              <div class="pg-control">
+                <label>Input x&#8321; <span class="pg-val" id="val-x1">0.60</span></label>
+                <input type="range" id="ctl-x1" min="-1" max="1" step="0.01" value="0.6" />
+              </div>
+              <div class="pg-control">
+                <label>Weight w&#8321; <span class="pg-val" id="val-w1">1.20</span></label>
+                <input type="range" id="ctl-w1" min="-2" max="2" step="0.01" value="1.2" />
+              </div>
+              <div class="pg-control">
+                <label>Input x&#8322; <span class="pg-val" id="val-x2">-0.30</span></label>
+                <input type="range" id="ctl-x2" min="-1" max="1" step="0.01" value="-0.3" />
+              </div>
+              <div class="pg-control">
+                <label>Weight w&#8322; <span class="pg-val" id="val-w2">0.80</span></label>
+                <input type="range" id="ctl-w2" min="-2" max="2" step="0.01" value="0.8" />
+              </div>
+              <div class="pg-control">
+                <label>Bias b <span class="pg-val" id="val-b">0.00</span></label>
+                <input type="range" id="ctl-b" min="-2" max="2" step="0.01" value="0" />
+              </div>
+            </div>
+
+            <div class="pg-activations">
+              <span class="pg-lbl">Activation:</span>
+              <button type="button" class="pg-act-btn active" data-act="sigmoid">Sigmoid</button>
+              <button type="button" class="pg-act-btn" data-act="relu">ReLU</button>
+              <button type="button" class="pg-act-btn" data-act="tanh">Tanh</button>
+            </div>
+            <p class="pg-act-desc" id="act-desc">
+              Sigmoid squashes any input into a value between 0 and 1, like a confidence score from 0% to 100%.
+            </p>
+          </div>
+
+          <p style="margin-top:18px;">
+            What you are feeling is the entire trick. The neuron combines evidence (inputs), decides how much
+            each piece matters (weights), sets a threshold for firing (bias), and shapes the answer
+            (activation function). Training a neural network just means a computer nudging millions or
+            billions of those weights, automatically, until the outputs look right. That is what makes deep
+            learning powerful: nobody has to hand-write the rules. It is also exactly what makes it opaque:
+            nobody can read a billion tuned weights and explain, line by line, why the network answered the
+            way it did.
+          </p>
+        </section>
+
+        <section class="art-section" id="architectures">
+          <h2>Four Architectures Worth Knowing</h2>
+          <p>
+            Different problems call for different network shapes. These four cover most of what a
+            decision-maker will encounter.
+          </p>
+          <div class="arch-grid">
+            <div class="arch-card">
+              <span class="arch-tag">ANN</span>
+              <h3>Artificial Neural Network</h3>
+              <p><strong>What it is:</strong> The general-purpose original. Layers of neurons (input, hidden, output) where information flows forward like a one-way street, each layer refining the previous one's work.</p>
+              <p><strong>How it learns:</strong> Backpropagation. The network compares its answer to the correct one, measures the error, and works backward adjusting every weight to shrink that error, over and over.</p>
+              <p><strong>Business use:</strong> Credit scoring and loan default prediction, where dozens of applicant variables combine in ways no simple formula captures.</p>
+            </div>
+            <div class="arch-card">
+              <span class="arch-tag">CNN</span>
+              <h3>Convolutional Neural Network</h3>
+              <p><strong>What it is:</strong> A network built for images, modeled loosely on how eyes and the visual brain work: early layers spot edges, later layers assemble them into shapes and objects.</p>
+              <p><strong>How it learns:</strong> It learns small visual filters and slides them across the image, so a pattern learned in one corner is recognized anywhere it appears.</p>
+              <p><strong>Business use:</strong> Document processing and fraud-pattern recognition: reading checks and invoices, flagging forged signatures, spotting anomalies in scanned records.</p>
+            </div>
+            <div class="arch-card">
+              <span class="arch-tag">RNN</span>
+              <h3>Recurrent Neural Network</h3>
+              <p><strong>What it is:</strong> A network with a memory. It processes sequences one step at a time and carries context forward, the way you remember the start of a sentence by the time you reach the end. The LSTM variant extends that memory over much longer stretches.</p>
+              <p><strong>How it learns:</strong> By looping its own output back in as input for the next step, it learns which parts of the past matter for predicting what comes next.</p>
+              <p><strong>Business use:</strong> Time-series forecasting: demand planning, cash-flow projection, and market data, where order and history are the signal.</p>
+            </div>
+            <div class="arch-card">
+              <span class="arch-tag">GAN</span>
+              <h3>Generative Adversarial Network</h3>
+              <p><strong>What it is:</strong> Two networks locked in a contest, introduced by Ian Goodfellow in 2014. A generator produces fakes; a discriminator judges real from fake. Each round makes both better.</p>
+              <p><strong>How it learns:</strong> Pure competition. The generator wins by fooling the judge, and the judge wins by not being fooled, until the fakes become nearly indistinguishable from reality.</p>
+              <p><strong>Business use:</strong> Synthetic data: realistic but artificial customer records for testing systems without exposing private data. The same power produces deepfakes, which is where the ethics section below picks up.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="art-section" id="trust">
+          <h2>Trust &amp; Measurement: Judging What You Cannot See</h2>
+          <p>
+            Here is the uncomfortable truth from this week's material: a deep network's decisions cannot be
+            audited the way a spreadsheet formula can. The inputs and outputs are visible; the reasoning is
+            not. Scientists are still working out how the internal layers do what they do. So if you cannot
+            inspect the thoughts, the only honest basis for trust is measuring the behavior, systematically
+            and repeatedly, the way an auditor tests a process rather than reading minds.
+          </p>
+          <p>
+            This is also a direct answer to feedback I received on the previous artifact, which asked how the
+            effectiveness of StudyBridge, the AI study assistant from Artifact 02, could be measured with real
+            users. Using StudyBridge as the case study, here is the evaluation framework I would apply, and
+            the one I would ask about before trusting any AI assistant a vendor demos:
+          </p>
+          <div class="metric-list">
+            <div class="metric">
+              <div class="m-num"></div>
+              <div>
+                <h4>Guardrail refusal rate</h4>
+                <p>Under a battery of adversarial prompts (asking it to write a graded essay, invent a citation, answer a quiz), what percentage does it correctly refuse? StudyBridge was tested this way once per rule; a real evaluation runs the full battery on a schedule and tracks the rate over time, because model updates can silently erode guardrails.</p>
+              </div>
+            </div>
+            <div class="metric">
+              <div class="m-num"></div>
+              <div>
+                <h4>Consistency across repeated prompts</h4>
+                <p>Language models are probabilistic: the same question can get different answers. Send identical prompts many times and measure how often the substance agrees. An assistant that gives a different study plan every Tuesday is not one a student can build a habit around.</p>
+              </div>
+            </div>
+            <div class="metric">
+              <div class="m-num"></div>
+              <div>
+                <h4>Task completion</h4>
+                <p>Did the session end with a concrete, dated plan the student can act on? That is StudyBridge's actual job. Sampling transcripts and scoring whether each conversation reached a usable plan measures the outcome, not just the pleasantness of the chat.</p>
+              </div>
+            </div>
+            <div class="metric">
+              <div class="m-num"></div>
+              <div>
+                <h4>User surveys: learning outcomes and trust</h4>
+                <p>Behavior metrics cannot capture whether students actually understood their material or felt the assistant was honest about its limits. Short before-and-after surveys on confidence, comprehension, and trust close that loop, and falling trust scores are an early warning even when the technical metrics look clean.</p>
+              </div>
+            </div>
+          </div>
+          <div class="callout">
+            <p>
+              The stakes of this measurement mindset are clearest at the extreme: deepfakes. The same GAN
+              machinery that generates safe synthetic test data can fabricate a video of an executive
+              announcing a merger that never happened, or a voice on the phone authorizing a wire transfer.
+              When synthetic media is indistinguishable from real, "it looks authentic" stops being evidence.
+              Verification has to shift from inspecting the artifact to measuring provenance: where did this
+              come from, through what channel, confirmed by what independent source? That is the black box
+              problem at its most extreme, and the discipline is the same one this framework applies to a
+              humble study assistant: trust what you can verify, not what you can see.
+            </p>
+          </div>
+        </section>
+
+        <section class="art-section" id="fieldguide">
+          <h2>Field Guide</h2>
+          <p>
+            A one-page quick reference distilling this artifact: the four architectures, when to reach for
+            which, and three questions to ask before trusting any AI system. Made to be kept next to your desk.
+          </p>
+          <div class="doc-actions" style="margin-top:18px;">
+            <a class="btn btn-primary" href="assets/artifacts/neural-networks-field-guide.pdf" download>Download the Neural Networks Field Guide (PDF)</a>
+          </div>
+        </section>
+
+        <section class="art-section" id="process">
+          <h2>Process</h2>
+          <p>
+            Started from the course material on deep learning and neural networks: the building blocks
+            (neurons, layers, connections), the role of activation functions, the four architectures, and the
+            black box problem. Translated the single-neuron math into an interactive simulator, coded from
+            scratch in plain JavaScript on an HTML canvas, with sliders for inputs, weights, and bias and a
+            switchable activation function, then tested the widget logic across edge cases (all-zero weights,
+            extreme bias, each activation). Wrote the architecture profiles to pair each concept from the
+            lesson with one concrete business application. Built the measurement framework by revisiting the
+            StudyBridge artifact and feedback on it, defining four metrics that observe behavior rather than
+            internals. Designed the one-page field guide in the site's visual style and linked it for download.
+          </p>
+        </section>
+
+        <section class="art-section" id="tools">
+          <h2>Tools &amp; Technologies</h2>
+          <p>
+            HTML / CSS / JavaScript (no frameworks, no build step) · Canvas API for the live neuron
+            visualization · AIML-500 lesson materials on deep learning and neural networks · Claude
+            (Anthropic) for structure and code assistance.
+          </p>
+        </section>
+
+        <section class="art-section" id="value">
+          <h2>Value Proposition</h2>
+          <p>
+            Most explanations of neural networks stop at a static diagram. This artifact hands the reader the
+            controls instead, in the "show, don't describe" spirit of this portfolio: move a weight, watch the
+            decision change, and the mechanism stops being abstract. For finance professionals and strategy
+            leaders, the architecture cards map each network type to a decision they already face, and the
+            measurement framework offers a concrete set of questions to bring to any AI vendor conversation:
+            what is the refusal rate, how consistent is it, does it finish the job, and do users trust it. The
+            framework is demonstrated on a real, live chatbot from an earlier artifact rather than a
+            hypothetical.
+          </p>
+        </section>
+
+        <section class="art-section" id="learnings">
+          <h2>Key Learnings</h2>
+          <ul>
+            <li>The gap between a neuron and a network is scale, not magic. Every parameter in the playground above is understandable on its own; opacity emerges only when millions of them interact. That reframed the black box problem for me from mysterious to structural.</li>
+            <li>Activation functions are small choices with large consequences. Switching sigmoid to ReLU in the widget visibly changes what the same evidence produces, which mirrors how architecture choices quietly shape real model behavior.</li>
+            <li>Interpretability and capability pull in opposite directions. The models easiest to explain are often the least powerful, which is why measurement, not inspection, has to carry the weight of trust in practice.</li>
+            <li>Evaluation is a design activity, not an afterthought. Defining the four StudyBridge metrics changed how I would build the assistant itself: instrumenting refusals and plan completion from day one instead of bolting measurement on later.</li>
+            <li>Building the widget without frameworks was a deliberate constraint. Writing the rendering and math by hand made every moving part of the neuron legible, which is the point of the exercise.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div>&copy; 2026 Moya Kramo · Data Science &amp; AI</div>
+      <div><a href="artifacts.html">All artifacts</a> · <a href="index.html">Home</a></div>
+    </div>
+  </footer>
+
+  <script src="assets/main.js"></script>
+  <script>
+  // ============================================================
+  // Neuron Playground
+  // A single artificial neuron: out = f(w1*x1 + w2*x2 + b)
+  // Plain JavaScript, no libraries.
+  // ============================================================
+  (function () {
+    var canvas = document.getElementById('neuronCanvas');
+    if (!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+
+    // state
+    var state = { x1: 0.6, x2: -0.3, w1: 1.2, w2: 0.8, b: 0, act: 'sigmoid' };
+
+    var ACTS = {
+      sigmoid: {
+        fn: function (z) { return 1 / (1 + Math.exp(-z)); },
+        range: [0, 1],
+        desc: 'Sigmoid squashes any input into a value between 0 and 1, like a confidence score from 0% to 100%.'
+      },
+      relu: {
+        fn: function (z) { return Math.max(0, z); },
+        range: [0, 4.4], // max possible: 2*1 + 2*1 + 2 = 6? cap display below
+        desc: 'ReLU passes positive signals through unchanged and silences negative ones, like attending only to evidence in favor.'
+      },
+      tanh: {
+        fn: function (z) { return Math.tanh(z); },
+        range: [-1, 1],
+        desc: 'Tanh outputs values between -1 and 1, like a rating that runs from strongly against to strongly in favor.'
+      }
+    };
+
+    // wire controls
+    function bind(id, key) {
+      var el = document.getElementById('ctl-' + id);
+      var lab = document.getElementById('val-' + id);
+      if (!el) return;
+      var update = function () {
+        state[key] = parseFloat(el.value);
+        if (lab) lab.textContent = state[key].toFixed(2);
+        draw();
+      };
+      el.addEventListener('input', update);
+      update();
+    }
+    bind('x1', 'x1'); bind('x2', 'x2'); bind('w1', 'w1'); bind('w2', 'w2'); bind('b', 'b');
+
+    var actButtons = document.querySelectorAll('.pg-act-btn');
+    var actDesc = document.getElementById('act-desc');
+    actButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        actButtons.forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        state.act = btn.getAttribute('data-act');
+        if (actDesc) actDesc.textContent = ACTS[state.act].desc;
+        draw();
+      });
+    });
+
+    // theme colors (match assets/style.css tokens)
+    var C = {
+      text: '#f4eef0', muted: '#b39aa1', muted2: '#8b757c',
+      pos: '#e63950', neg: '#5f7ea0', node: '#22161a',
+      border: '#3a2329', grad0: '#7a1526', grad1: '#d6294a'
+    };
+
+    function compute() {
+      var z = state.w1 * state.x1 + state.w2 * state.x2 + state.b;
+      var out = ACTS[state.act].fn(z);
+      return { z: z, out: out };
+    }
+
+    // map an output to 0..1 intensity for the neuron fill
+    function intensity(out) {
+      var r = ACTS[state.act].range;
+      var span = r[1] - r[0];
+      var v = (Math.min(Math.max(out, r[0]), r[1]) - r[0]) / span;
+      return Math.min(Math.max(v, 0), 1);
+    }
+
+    function connColor(w) { return w >= 0 ? C.pos : C.neg; }
+    function connWidth(w) { return 1.5 + Math.min(Math.abs(w), 2) * 3.5; }
+
+    function drawNode(x, y, r, fill, stroke, lw) {
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = fill;
+      ctx.fill();
+      ctx.lineWidth = lw || 1.5;
+      ctx.strokeStyle = stroke;
+      ctx.stroke();
+    }
+
+    function draw() {
+      var W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      var res = compute();
+      var inX = 130, in1Y = 130, in2Y = 310;
+      var nX = 430, nY = 220, nR = 52;
+      var outX = 700, outY = 220;
+
+      // --- connections ---
+      [[in1Y, state.w1, 'w₁'], [in2Y, state.w2, 'w₂']].forEach(function (row) {
+        var y = row[0], w = row[1], lbl = row[2];
+        ctx.beginPath();
+        ctx.moveTo(inX + 34, y);
+        ctx.lineTo(nX - nR - 4, nY);
+        ctx.strokeStyle = connColor(w);
+        ctx.lineWidth = connWidth(w);
+        ctx.globalAlpha = 0.9;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        // weight label at midpoint
+        var mx = (inX + 34 + nX - nR) / 2, my = (y + nY) / 2;
+        ctx.fillStyle = C.muted;
+        ctx.font = '600 14px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(lbl + ' = ' + w.toFixed(2), mx, my - 12);
+      });
+
+      // connection neuron -> output
+      ctx.beginPath();
+      ctx.moveTo(nX + nR + 4, nY);
+      ctx.lineTo(outX - 46, outY);
+      ctx.strokeStyle = C.pos;
+      ctx.lineWidth = 2 + intensity(res.out) * 5;
+      ctx.globalAlpha = 0.35 + intensity(res.out) * 0.65;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // --- input nodes ---
+      [[in1Y, state.x1, 'x₁'], [in2Y, state.x2, 'x₂']].forEach(function (row) {
+        var y = row[0], v = row[1], lbl = row[2];
+        drawNode(inX, y, 30, C.node, C.border, 2);
+        ctx.fillStyle = C.text;
+        ctx.font = '700 15px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(v.toFixed(2), inX, y);
+        ctx.fillStyle = C.muted2;
+        ctx.font = '600 13px Inter, sans-serif';
+        ctx.fillText('input ' + lbl, inX, y + 50);
+      });
+
+      // --- neuron body: fill intensity tracks output ---
+      var t = intensity(res.out);
+      var g = ctx.createRadialGradient(nX, nY, 6, nX, nY, nR);
+      g.addColorStop(0, 'rgba(214,41,74,' + (0.25 + 0.75 * t) + ')');
+      g.addColorStop(1, 'rgba(122,21,38,' + (0.15 + 0.55 * t) + ')');
+      drawNode(nX, nY, nR, g, t > 0.55 ? C.grad1 : C.border, 2.5);
+
+      ctx.fillStyle = C.text;
+      ctx.font = '700 14px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('z = ' + res.z.toFixed(2), nX, nY - 10);
+      ctx.fillStyle = C.muted;
+      ctx.font = '600 12px Inter, sans-serif';
+      ctx.fillText(state.act + '(z)', nX, nY + 12);
+      ctx.fillStyle = C.muted2;
+      ctx.font = '600 13px Inter, sans-serif';
+      ctx.fillText('neuron', nX, nY + nR + 22);
+      ctx.fillText('bias b = ' + state.b.toFixed(2), nX, nY - nR - 16);
+
+      // --- output ---
+      ctx.fillStyle = C.text;
+      ctx.font = '800 30px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(res.out.toFixed(3), outX - 38, outY - 4);
+      ctx.fillStyle = C.muted2;
+      ctx.font = '600 13px Inter, sans-serif';
+      ctx.fillText('output', outX - 38, outY + 24);
+
+      // output bar
+      var r = ACTS[state.act].range;
+      var barX = outX - 40, barY = outY + 48, barW = 170, barH = 10;
+      ctx.fillStyle = '#241419';
+      ctx.fillRect(barX, barY, barW, barH);
+      ctx.fillStyle = C.pos;
+      ctx.fillRect(barX, barY, barW * t, barH);
+      ctx.strokeStyle = C.border;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(barX, barY, barW, barH);
+      ctx.fillStyle = C.muted2;
+      ctx.font = '500 11px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(r[0].toFixed(0), barX, barY + 26);
+      ctx.textAlign = 'right';
+      ctx.fillText(state.act === 'relu' ? 'high' : r[1].toFixed(0), barX + barW, barY + 26);
+
+      // --- activation curve (small plot, bottom right) ---
+      var px = 630, py = 455, pw = 200, ph = 110;
+      var zMin = -4, zMax = 4;
+      ctx.strokeStyle = C.border;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(px, py - ph, pw, ph);
+      // axis line (z = 0)
+      ctx.beginPath();
+      ctx.moveTo(px + pw / 2, py - ph);
+      ctx.lineTo(px + pw / 2, py);
+      ctx.strokeStyle = 'rgba(179,154,161,0.25)';
+      ctx.stroke();
+
+      function plotY(v) {
+        var lo, hi;
+        if (state.act === 'sigmoid') { lo = 0; hi = 1; }
+        else if (state.act === 'tanh') { lo = -1; hi = 1; }
+        else { lo = 0; hi = 4; }
+        var clamped = Math.min(Math.max(v, lo), hi);
+        return py - ((clamped - lo) / (hi - lo)) * (ph - 8) - 4;
+      }
+
+      ctx.beginPath();
+      for (var i = 0; i <= 100; i++) {
+        var zz = zMin + (zMax - zMin) * (i / 100);
+        var vv = ACTS[state.act].fn(zz);
+        var xx = px + (i / 100) * pw;
+        var yy = plotY(vv);
+        if (i === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+      }
+      ctx.strokeStyle = C.pos;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // current point on the curve
+      var zClamped = Math.min(Math.max(res.z, zMin), zMax);
+      var dotX = px + ((zClamped - zMin) / (zMax - zMin)) * pw;
+      var dotY = plotY(ACTS[state.act].fn(zClamped));
+      drawNode(dotX, dotY, 5, '#fff', C.pos, 2);
+
+      ctx.fillStyle = C.muted2;
+      ctx.font = '600 12px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('activation curve: ' + state.act + '(z), z from -4 to 4', px, py + 22);
+    }
+
+    draw();
+  })();
+  </script>
+</body>
+</html>

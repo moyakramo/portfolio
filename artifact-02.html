@@ -40,6 +40,7 @@
           <li><a href="#tools">Tools &amp; Technologies</a></li>
           <li><a href="#value">Value Proposition</a></li>
           <li><a href="#learnings">Key Learnings</a></li>
+          <li><a href="#measurement">Measuring StudyBridge</a></li>
         </ul>
       </aside>
 
@@ -165,6 +166,22 @@
             <li>Guardrails need adversarial tests. Each boundary was confirmed by trying to break it, including asking the assistant to write a graded post and to fabricate a citation.</li>
             <li>Free tools carry real constraints. Reading the platform's terms surfaced message limits, content caps, and a deletion policy that shaped how the assistant was deployed and maintained.</li>
           </ul>
+        </section>
+
+        <section class="art-section" id="measurement">
+          <h2>Measuring StudyBridge: Next Steps</h2>
+          <p>
+            Feedback I received on this artifact asked a question worth answering in public: how would the
+            effectiveness of StudyBridge be measured with real users? The launch testing above proved the
+            guardrails hold once; it did not prove they keep holding, or that students actually learn better.
+            The measurement roadmap: track the guardrail refusal rate under a repeated battery of adversarial
+            prompts, measure consistency by sending identical prompts many times and scoring how often the
+            substance agrees, score task completion (did the session end with a concrete, dated study plan),
+            and run short before-and-after user surveys on comprehension, confidence, and trust in the
+            assistant. That question became the foundation for the next artifact,
+            <a href="artifact-03.html" style="color:var(--red-bright); font-weight:600;">Inside the Black Box</a>,
+            which develops this evaluation framework in full.
+          </p>
         </section>
       </div>
     </div>
