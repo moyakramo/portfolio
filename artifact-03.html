@@ -119,6 +119,7 @@
           <li><a href="#playground">Neuron Playground</a></li>
           <li><a href="#architectures">Four Architectures</a></li>
           <li><a href="#trust">Trust &amp; Measurement</a></li>
+          <li><a href="#feedback-response">Measuring Impact</a></li>
           <li><a href="#fieldguide">Field Guide</a></li>
           <li><a href="#process">Process</a></li>
           <li><a href="#tools">Tools &amp; Technologies</a></li>
@@ -329,6 +330,51 @@
               problem at its most extreme, and the discipline is the same one this framework applies to a
               humble study assistant: trust what you can verify, not what you can see.
             </p>
+          </div>
+        </section>
+
+        <section class="art-section" id="feedback-response">
+          <h2>Measuring Impact, and Explaining It to a Room That Is Not Technical</h2>
+          <p>
+            Two questions came back on this artifact after it shipped: how would you know whether someone
+            using the playground above actually understood neural networks better afterward, and how would
+            you explain the relationship between explainability, performance, and trust to executives with no
+            technical background. Both deserve more than a demo.
+          </p>
+          <div class="metric-list">
+            <div class="metric">
+              <div class="m-num"></div>
+              <div>
+                <h4>Measuring whether the playground teaches anything</h4>
+                <p>
+                  A page view is not evidence of learning. The honest test: a short two-question check before
+                  the visitor touches a slider ("if I raise this weight, what happens to the output?") and the
+                  same check afterward, scored for improvement rather than for a passing grade. A second,
+                  cheaper proxy: turn the widget into a prediction game, ask the visitor to guess the output
+                  before they see it, log how often the guess lands within a small margin, and watch that
+                  number improve across attempts in a single session. Neither requires a control group or a
+                  research budget, and both would tell me something a page-view count never could: whether the
+                  hands-on format actually built intuition, or just felt like it did.
+                </p>
+              </div>
+            </div>
+            <div class="metric">
+              <div class="m-num"></div>
+              <div>
+                <h4>Explaining explainability, performance, and trust to executives</h4>
+                <p>
+                  Three sentences, no jargon. First: the models best at the task are usually the hardest to
+                  explain, and that is a real trade-off, not a bug someone forgot to fix. Second: because you
+                  cannot always open the box, trust has to come from watching what a system does, consistently,
+                  over time (the refusal-rate and consistency metrics above), not from a single confident demo.
+                  Third: you do not have to choose between a powerful model and an explainable one. A technique
+                  like SHAP sits on top of a high-performing model and produces a plain-language reason for one
+                  specific decision, which is exactly how a lender can keep an accurate credit model and still
+                  tell a denied applicant why. Explainability, in other words, is a layer you add, not a
+                  trade-off you accept.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
