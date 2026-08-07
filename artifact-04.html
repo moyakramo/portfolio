@@ -192,6 +192,7 @@
         <a class="back" href="artifacts.html">&larr; Back to Artifacts</a>
         <ul>
           <li><a href="#introduction" class="active">Introduction</a></li>
+          <li><a href="#description">Description</a></li>
           <li><a href="#objective">Objective</a></li>
           <li><a href="#exhibit-imbalance">Ex.01 Cancer Detector</a></li>
           <li><a href="#exhibit-drift">Ex.02 The Forgetting Model</a></li>
@@ -202,10 +203,14 @@
           <li><a href="#checklist">The Checklist Room</a></li>
           <li><a href="#leaders">For Leaders</a></li>
           <li><a href="#limitations">Where This Simplifies</a></li>
+          <li><a href="#outcomes">Measuring the Museum</a></li>
           <li><a href="#process">Process</a></li>
           <li><a href="#tools">Tools &amp; Technologies</a></li>
           <li><a href="#value">Value Proposition</a></li>
+          <li><a href="#unique">Unique Value</a></li>
+          <li><a href="#relevance">Relevance</a></li>
           <li><a href="#learnings">Key Learnings</a></li>
+          <li><a href="#references">References</a></li>
         </ul>
       </aside>
 
@@ -248,6 +253,27 @@
             where an AI coach walked through class imbalance, data drift, and explainability in a credit model.
             The rest come straight from this week's lesson outline of data challenges. Walk through in order,
             or jump to whichever failure mode is closest to a system you already work with.
+          </p>
+        </section>
+
+        <section class="art-section" id="description">
+          <h2>Description</h2>
+          <p>
+            A single-page interactive museum with six exhibits, each one a small machine learning system the
+            visitor breaks personally. Exhibit 01 skews the class balance of a cancer screening dataset and
+            shows accuracy climbing while recall collapses. Exhibit 02 animates covariate shift in a
+            recommendation engine over six weeks. Exhibit 03 lets the visitor widen or close an approval-rate
+            gap in a hiring model. Exhibit 04 presents a deliberately dirty table and a set of fixes to apply.
+            Exhibit 05 denies a loan and then reveals the per-feature attribution behind the decision.
+            Exhibit 06 trades data utility against privacy across sharing, anonymization, and federated
+            learning.
+          </p>
+          <p>
+            Every exhibit is coded from scratch in plain JavaScript with no frameworks and no build step.
+            After the exhibits, a checklist room folds the full list of data challenges back into twelve
+            questions to ask before production, a section for leaders covers the human bias that surrounds the
+            technical bias, a limitations section states exactly which numbers are illustrative, and a
+            one-page field checklist is available for download.
           </p>
         </section>
 
@@ -668,6 +694,38 @@
           </p>
         </section>
 
+        <section class="art-section" id="outcomes">
+          <h2>Measuring the Museum: Outcomes and Planned Testing</h2>
+          <p>
+            Feedback I received on this artifact asked for measurable outcomes: user feedback, engagement
+            metrics, or planned usability testing that would demonstrate whether the interactive design
+            actually works. That question is the right one to ask of any interactive resource, and it is
+            worth answering honestly rather than with a claim.
+          </p>
+          <p>
+            What exists so far is qualitative and small. Peer review in Workshop Five produced unprompted
+            comment on which parts of the museum landed, with the limitations section named specifically as
+            the piece that made the exhibits credible rather than merely entertaining. That is a sample of a
+            few readers, not evidence of effectiveness, and it is being treated as such.
+          </p>
+          <p>
+            The planned testing is deliberately modest and specific, since a resource like this does not need
+            an elaborate study to be evaluated:
+          </p>
+          <ul>
+            <li><strong>Comprehension before and after, on one exhibit.</strong> A three-question check on Exhibit 01, asked before and after interaction, focused on whether a reader can state why a 99.6 percent accurate classifier can be worthless. This is the single claim the exhibit exists to teach, so it is the one worth measuring.</li>
+            <li><strong>Task completion rather than time on page.</strong> Whether a visitor moves the slider past the point where recall collapses, and whether they open more than one exhibit. Time on page cannot distinguish engagement from confusion, so it is not a useful signal here.</li>
+            <li><strong>Download of the field checklist as an intent signal.</strong> The download is the one action that indicates a visitor expects to use the material away from the page, which is the stated goal of the artifact.</li>
+            <li><strong>Five-person moderated usability pass.</strong> Watching five readers work through the museum without guidance, specifically to find where they stop, which exhibits they skip, and whether the controls are self-evident. Five is enough to surface the structural problems, which is what this stage needs.</li>
+            <li><strong>One structured feedback question rather than a survey.</strong> Asking a single question, which exhibit changed how you would evaluate a model, since a short prompt that people answer beats a long survey they abandon.</li>
+          </ul>
+          <p>
+            This measurement thinking became the basis for the final artifact in this portfolio,
+            <a href="artifact-05.html" style="color:var(--red-bright); font-weight:600;">The Readiness Question</a>,
+            where measurement is one of the four scored dimensions rather than a closing section.
+          </p>
+        </section>
+
         <section class="art-section" id="process">
           <h2>Process</h2>
           <p>
@@ -707,6 +765,42 @@
           </p>
         </section>
 
+        <section class="art-section" id="unique">
+          <h2>Unique Value</h2>
+          <p>
+            The distinguishing choice here is that the visitor causes the failure rather than watching one.
+            Reading that class imbalance inflates accuracy is forgettable. Dragging a slider until a cancer
+            detector reports 99.6 percent accuracy while catching almost nothing, and having personally caused
+            it, is not. Six failures in six minutes, each self-inflicted, is a different learning mechanism
+            from a case study.
+          </p>
+          <p>
+            The second distinguishing choice is the limitations section. Stating plainly which numbers came
+            from course material and which were chosen to make a mechanism visible costs some of the
+            simulator's authority and buys back credibility, which matters more for a resource that asks a
+            reader to change how they evaluate models.
+          </p>
+        </section>
+
+        <section class="art-section" id="relevance">
+          <h2>Relevance</h2>
+          <p>
+            Every failure in this museum is currently live somewhere in financial services. Class imbalance is
+            the default condition of fraud and default prediction. Covariate shift is what happens to a credit
+            or pricing model as the customer base changes. Approval-rate gaps across groups are the subject of
+            fair lending examination. Black-box denials collide with adverse-action notice requirements. Data
+            sharing against privacy constraints is the daily condition of any institution holding customer
+            records.
+          </p>
+          <p>
+            The audience for this is not primarily the person training the model. It is the person approving
+            it: the risk officer, the product owner, the executive signing off on a vendor. Those readers do
+            not need to implement resampling, they need to know the question exists and recognize the answer
+            when it is evasive. Six minutes of breaking things is a faster route to that recognition than a
+            governance document.
+          </p>
+        </section>
+
         <section class="art-section" id="learnings">
           <h2>Key Learnings</h2>
           <ul>
@@ -715,6 +809,17 @@
             <li>Explainability is a layer you add, not a trade-off you accept. TreeSHAP's speed is what makes Exhibit 05 realistic: a lender does not have to choose between an accurate model and a compliant one.</li>
             <li>Writing for a non-technical, executive audience is a harder exercise than writing for a technical peer. Every exhibit needed one sentence a leader could repeat in a meeting without a caveat attached, which took several drafts to get honest and simple at the same time.</li>
             <li>Six small pieces changed how I think about scope, compared to one large one. Each exhibit had to stand alone and make its point in under a minute, which is a different discipline than building a single deep interactive widget.</li>
+          </ul>
+        </section>
+
+        <section class="art-section" id="references">
+          <h2>References</h2>
+          <ul>
+            <li>AIML-500 Machine Learning Fundamentals, Workshop Four course materials on data challenges in machine learning.</li>
+            <li>Data Challenge Scenarios Coach transcript, AIML-500, covering class imbalance in a cancer classifier, covariate shift in a recommendation engine, and explainability in a credit model. Source for Exhibits 01, 02, and 05.</li>
+            <li>Downloadable companion:
+              <a href="assets/artifacts/ai-failure-museum-checklist.pdf" style="color:var(--red-bright)">AI Failure Museum Field Checklist (PDF)</a>.</li>
+            <li>Feedback received on this artifact, which prompted the Measuring the Museum section above.</li>
           </ul>
         </section>
       </div>

@@ -33,14 +33,18 @@
         <a class="back" href="artifacts.html">&larr; Back to Artifacts</a>
         <ul>
           <li><a href="#introduction" class="active">Introduction</a></li>
+          <li><a href="#description">Description</a></li>
           <li><a href="#objective">Objective</a></li>
           <li><a href="#assistant">The Assistant</a></li>
           <li><a href="#document">Visual Overview</a></li>
           <li><a href="#process">Process</a></li>
           <li><a href="#tools">Tools &amp; Technologies</a></li>
           <li><a href="#value">Value Proposition</a></li>
+          <li><a href="#unique">Unique Value</a></li>
+          <li><a href="#relevance">Relevance</a></li>
           <li><a href="#learnings">Key Learnings</a></li>
           <li><a href="#measurement">Measuring StudyBridge</a></li>
+          <li><a href="#references">References</a></li>
         </ul>
       </aside>
 
@@ -76,6 +80,24 @@
             iterating a live AI study assistant named StudyBridge, deployed as a shareable chatbot that
             anyone can try. The full build documentation, including the system prompt and real test
             transcripts, is embedded below.
+          </p>
+        </section>
+
+        <section class="art-section" id="description">
+          <h2>Description</h2>
+          <p>
+            StudyBridge is a deployed conversational assistant, not a mockup. It runs on Chatbase behind a
+            custom system prompt that defines a persona, an ordered intake flow of three questions before any
+            advice is given, and a set of refusals it will not negotiate: it does not write graded work,
+            invent citations, or answer graded questions directly. The artifact page links to the live
+            chatbot, embeds a visual overview deck, and offers the full build documentation as a download,
+            including the complete system prompt and transcripts of the tests run against each boundary.
+          </p>
+          <p>
+            The build followed a three-stage lab. Stage one was hands-on comparison of three categories of
+            generative tool: a general large language model, a custom GPT, and STORM, a Stanford research
+            assistant. Stage two applied design thinking to a defined user problem. Stage three built, tested,
+            and iterated the assistant itself.
           </p>
         </section>
 
@@ -158,6 +180,30 @@
           </p>
         </section>
 
+        <section class="art-section" id="unique">
+          <h2>Unique Value</h2>
+          <p>
+            Most portfolio entries about generative AI describe a tool the author used. This one is a tool the
+            visitor can use, still deployed and still enforcing its rules, with the system prompt that produces
+            that behavior published alongside it. The verification is the point: a reader can open the chatbot,
+            ask it to write a graded discussion post, watch it refuse, and then read the exact instruction that
+            makes it refuse. Very little AI work is falsifiable by the reader in that way.
+          </p>
+        </section>
+
+        <section class="art-section" id="relevance">
+          <h2>Relevance</h2>
+          <p>
+            Organizations deploying customer-facing assistants face the same problem this build faced at a much
+            smaller scale: the model is capable of far more than you want it to do, and the difference between a
+            usable assistant and a liability is the scoping and the testing rather than the model. A support
+            chatbot that can be talked into promising a refund, or a financial assistant that can be talked into
+            giving advice the firm is not licensed to give, is the same failure demonstrated here with academic
+            integrity. The discipline transfers directly: define the refusals first, then test them adversarially,
+            then keep testing them, because a probabilistic system that held once has not been proven to hold.
+          </p>
+        </section>
+
         <section class="art-section" id="learnings">
           <h2>Key Learnings</h2>
           <ul>
@@ -182,6 +228,18 @@
             <a href="artifact-03.html" style="color:var(--red-bright); font-weight:600;">Inside the Black Box</a>,
             which develops this evaluation framework in full.
           </p>
+        </section>
+
+        <section class="art-section" id="references">
+          <h2>References</h2>
+          <ul>
+            <li>AIML-500 Machine Learning Fundamentals, Workshop Two course materials on generative AI tools and design thinking.</li>
+            <li>Chatbase platform documentation, privacy statement, and terms of service, reviewed before deployment.</li>
+            <li>STORM, Stanford University research assistant, used in the tool-comparison stage of the lab.</li>
+            <li>Universal Primer custom GPT, used in the tool-comparison stage of the lab.</li>
+            <li>Full build documentation with the system prompt and test transcripts:
+              <a href="assets/artifacts/AIML500_1.4_AI_Lab_Kramo.pdf" style="color:var(--red-bright)">AIML500_1.4_AI_Lab_Kramo.pdf</a>.</li>
+          </ul>
         </section>
       </div>
     </div>

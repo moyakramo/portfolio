@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Readiness Question: Scoring an AI Project Before You Build It · Moya Kramo</title>
+  <meta name="description" content="An interactive AI Readiness Scorecard that scores a real project across data foundation, explainability, measurement, and governance, and a capstone look back at what four prior artifacts add up to." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    /* Scoped styles for this artifact's components. Uses the site's design tokens. */
+    .detail-header h1 .accent {
+      background: var(--grad);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    /* --- scorecard shell --- */
+    .card-shell {
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius); padding: 26px 28px; margin: 16px 0 22px;
+      box-shadow: var(--shadow);
+    }
+    .sc-tag {
+      display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: 1.6px;
+      color: var(--red-bright); text-transform: uppercase; margin-bottom: 6px;
+    }
+    .sc-note { color: var(--muted-2); font-size: 12.5px; margin-top: 14px; font-style: italic; }
+
+    /* --- question groups --- */
+    .dim-block { padding: 20px 0; border-top: 1px dashed var(--border); }
+    .dim-block:first-of-type { border-top: none; padding-top: 6px; }
+    .dim-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    .dim-head h4 { margin: 0 0 2px; font-size: 1.02rem; color: var(--text); }
+    .dim-head .dim-score {
+      font-size: 13px; font-weight: 700; color: var(--red-bright);
+      font-variant-numeric: tabular-nums; white-space: nowrap;
+    }
+    .dim-sub { color: var(--muted-2); font-size: 12.5px; margin: 0 0 6px; }
+
+    .q { margin: 18px 0 0; }
+    .q > p.qt {
+      margin: 0 0 9px; font-size: 14px; font-weight: 600; color: var(--muted); letter-spacing: .2px;
+    }
+    .q-opts { display: flex; flex-direction: column; gap: 8px; }
+    .q-opt {
+      display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 10px 14px; font-size: 13.5px; color: var(--muted); transition: .15s; line-height: 1.5;
+    }
+    .q-opt:hover { border-color: var(--accent); color: var(--text); }
+    .q-opt input { margin-top: 4px; accent-color: var(--accent); flex: none; }
+    .q-opt.on { color: var(--text); border-color: var(--accent); background: var(--grad-soft); }
+
+    /* --- results panel --- */
+    .sc-result { margin-top: 4px; }
+    .sc-score-row {
+      display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 6px;
+    }
+    .sc-big {
+      font-size: 3rem; font-weight: 800; line-height: 1;
+      background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+      font-variant-numeric: tabular-nums;
+    }
+    .sc-outof { color: var(--muted-2); font-size: 14px; font-weight: 600; }
+    .sc-band { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+    .sc-band small { display: block; font-weight: 500; font-size: 12.5px; color: var(--muted-2); letter-spacing: .3px; }
+
+    .bar-row { margin: 13px 0; }
+    .bar-label {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 600;
+    }
+    .bar-label .bv { color: var(--text); font-variant-numeric: tabular-nums; font-weight: 700; }
+    .bar-track {
+      height: 12px; border-radius: 999px; background: var(--surface-2);
+      border: 1px solid var(--border); overflow: hidden;
+    }
+    .bar-fill { height: 100%; width: 0%; background: var(--grad); transition: width .45s ease; }
+    .bar-fill.weak { background: linear-gradient(135deg, #6b3a12, #b3691f); }
+    .bar-fill.good { background: linear-gradient(135deg, #2f7a4f, #43a06a); }
+
+    .weak-callout {
+      margin-top: 18px; background: var(--surface-2); border: 1px solid var(--border-soft);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-sm);
+      padding: 15px 18px; font-size: .94rem; color: var(--text);
+    }
+    .weak-callout strong { color: var(--red-bright); }
+    .weak-callout a { color: var(--red-bright); }
+
+    .sc-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+    .opt-btn {
+      padding: 9px 18px; border-radius: 999px; font-size: 13.5px; font-weight: 600;
+      background: var(--surface-2); border: 1px solid var(--border); color: var(--muted);
+      cursor: pointer; transition: .18s; font-family: var(--font);
+    }
+    .opt-btn:hover { color: var(--text); border-color: var(--accent); }
+
+    /* sticky result on wide screens */
+    .sc-grid { display: grid; grid-template-columns: 1.35fr .95fr; gap: 26px; align-items: start; }
+    .sc-panel {
+      position: sticky; top: 96px;
+      background: var(--surface-2); border: 1px solid var(--border-soft);
+      border-radius: var(--radius); padding: 22px 24px;
+    }
+    @media (max-width: 900px) {
+      .sc-grid { grid-template-columns: 1fr; }
+      .sc-panel { position: static; }
+    }
+
+    /* --- throughline map --- */
+    .thread { display: grid; gap: 12px; margin-top: 14px; }
+    .thread-item {
+      display: grid; grid-template-columns: 62px 1fr; gap: 16px; align-items: start;
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm); padding: 16px 18px;
+    }
+    .thread-num {
+      font-size: 12px; font-weight: 800; letter-spacing: 1px; color: var(--red-bright);
+      padding-top: 3px;
+    }
+    .thread-item h4 { margin: 0 0 4px; font-size: .98rem; color: var(--text); }
+    .thread-item p { margin: 0; font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+    .thread-item p.asked { margin-top: 7px; color: var(--muted-2); font-style: italic; font-size: 13px; }
+
+    .dim-map { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
+    @media (max-width: 720px) { .dim-map { grid-template-columns: 1fr; } }
+    .dim-card {
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm); padding: 16px 18px;
+    }
+    .dim-card h4 { margin: 0 0 6px; font-size: .96rem; color: var(--text); }
+    .dim-card p { margin: 0 0 8px; font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+    .dim-card .costs { font-size: 13px; color: var(--muted-2); }
+    .dim-card .costs strong { color: var(--red-bright); font-weight: 700; }
+
+    .ref-list { font-size: 13.5px; color: var(--muted); line-height: 1.7; }
+    .ref-list li { margin-bottom: 9px; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav">
+      <a class="brand" href="index.html">
+        <span class="mark">MK</span>
+        <span>Moya Kramo<small>Data Science &amp; AI</small></span>
+      </a>
+      <button class="nav-toggle" aria-label="Menu">&#9776;</button>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="artifacts.html" class="active">Artifacts</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <div class="detail">
+      <!-- SIDEBAR -->
+      <aside class="side-nav">
+        <a class="back" href="artifacts.html">&larr; Back to Artifacts</a>
+        <ul>
+          <li><a href="#introduction" class="active">Introduction</a></li>
+          <li><a href="#description">Description</a></li>
+          <li><a href="#objective">Objective</a></li>
+          <li><a href="#scorecard">The Readiness Scorecard</a></li>
+          <li><a href="#dimensions">The Four Dimensions</a></li>
+          <li><a href="#throughline">The Throughline</a></li>
+          <li><a href="#limitations">Where a Score Falls Short</a></li>
+          <li><a href="#takeaway">One-Page Takeaway</a></li>
+          <li><a href="#process">Process</a></li>
+          <li><a href="#tools">Tools &amp; Technologies</a></li>
+          <li><a href="#value">Value Proposition</a></li>
+          <li><a href="#unique">Unique Value</a></li>
+          <li><a href="#relevance">Relevance</a></li>
+          <li><a href="#learnings">Key Learnings</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="detail-main">
+        <header class="detail-header">
+          <div class="art-index">ARTIFACT 05</div>
+          <h1>The <span class="accent">Readiness Question</span>: Scoring an AI Project Before You Build It</h1>
+          <div class="pills">
+            <span class="pill brand">AI Strategy</span>
+            <span class="pill brand">Decision Tool</span>
+            <span class="pill brand">Capstone Synthesis</span>
+          </div>
+          <p class="sub">
+            Four artifacts in this portfolio asked how machine learning works, how it is built, how it is
+            trusted, and how it breaks. This one asks the question a decision-maker actually has to answer:
+            given a specific project, is it ready? Score a real one below across data foundation,
+            explainability, measurement, and governance, and see which dimension is holding it back.
+          </p>
+          <div class="doc-actions">
+            <a class="btn btn-primary" href="#scorecard">Score a project &darr;</a>
+            <a class="btn btn-ghost" href="assets/artifacts/ai-readiness-scorecard.pdf" download>Download the scorecard</a>
+          </div>
+        </header>
+
+        <section class="art-section" id="introduction">
+          <h2>Introduction</h2>
+          <p>
+            There is a gap between understanding how machine learning works and knowing whether a particular
+            project should go ahead. The first is a knowledge problem and this portfolio has spent four
+            artifacts on it. The second is a judgment problem, and it is the one that costs money: a team can
+            correctly explain gradient descent, name every activation function, and still ship a model that
+            nobody can audit, on data nobody checked, measured against a metric that hides the failure that
+            matters.
+          </p>
+          <p>
+            The pattern showed up repeatedly across the earlier artifacts. A cancer classifier that is 99.6
+            percent accurate and catches almost no cancer. A recommendation engine that quietly degrades as
+            its audience changes. A loan model that is defensible in aggregate and indefensible for the
+            individual it just denied. In every one of those cases the modeling was not the weak point. The
+            surrounding conditions were.
+          </p>
+          <p>
+            This final artifact turns those conditions into something a person can use in a meeting. It is a
+            scorecard: twelve questions across four dimensions, scored live in the browser, producing a
+            readiness rating and a named weakest link. It is also a look back at what the five artifacts add
+            up to, because the four dimensions in the scorecard are not invented for this page. Each one is
+            the thing an earlier artifact was really about.
+          </p>
+        </section>
+
+        <section class="art-section" id="description">
+          <h2>Description</h2>
+          <p>
+            This artifact has three parts. The first is the AI Readiness Scorecard, an interactive tool built
+            from scratch in plain JavaScript. The visitor answers twelve questions about a real or planned AI
+            project, three in each of four dimensions: data foundation, explainability, measurement, and
+            governance and monitoring. Each answer scores zero, one, or two points. The panel updates live
+            with a total out of twenty-four, a per-dimension breakdown, a readiness band, and a callout naming
+            the single weakest dimension with a concrete next step and a link to the artifact in this
+            portfolio that covers it.
+          </p>
+          <p>
+            The second part is a written breakdown of the four dimensions: what each one buys a team, what
+            skipping it costs, and what that cost looks like specifically in a finance or business setting.
+            The third part is a short retrospective tracing the throughline across all five artifacts, from
+            the history of the field to a working chatbot to a neuron simulator to six failure exhibits to
+            this scorecard, and a downloadable one-page version of the scorecard for use away from the
+            browser.
+          </p>
+        </section>
+
+        <section class="art-section" id="objective">
+          <h2>Objective</h2>
+          <p>
+            Three goals. First, convert the recurring lesson of this portfolio, that machine learning projects
+            fail on their conditions rather than on their math, into a tool that produces a decision rather
+            than an explanation. Second, close the portfolio as a portfolio: give a visitor arriving at the
+            final artifact a reason to go back into the earlier four, by linking every weak score directly to
+            the artifact that addresses it. Third, respond to feedback received on the previous artifact,
+            which asked for measurable outcomes, by making measurement one of the four scored dimensions
+            rather than a closing paragraph, and by treating the score itself as the measurable output the
+            visitor takes away.
+          </p>
+        </section>
+
+        <!-- ============ SCORECARD ============ -->
+        <section class="art-section" id="scorecard">
+          <h2>The Readiness Scorecard</h2>
+          <p>
+            Pick a real project. An internal forecasting model, a vendor tool your team is evaluating, a
+            credit or fraud system already in production, or something you have only sketched. Answer as it
+            actually is today, not as you intend it to be. The panel scores live.
+          </p>
+
+          <div class="card-shell">
+            <div class="sc-tag">Interactive &middot; nothing is stored or sent anywhere</div>
+            <div class="sc-grid">
+              <!-- QUESTIONS -->
+              <div id="sc-questions">
+
+                <div class="dim-block" data-dim="data">
+                  <div class="dim-head">
+                    <div>
+                      <h4>1. Data Foundation</h4>
+                      <p class="dim-sub">What the model learned from, and whether anyone checked it.</p>
+                    </div>
+                    <span class="dim-score" data-dimscore="data">0 / 6</span>
+                  </div>
+
+                  <div class="q" data-q="d1">
+                    <p class="qt">Do you know the class balance of your training data?</p>
+                    <div class="q-opts">
+                      <label class="q-opt"><input type="radio" name="d1" value="0" /><span>We have not checked.</span></label>
+                      <label class="q-opt"><input type="radio" name="d1" value="1" /><span>Yes, and it is skewed, but we have not adjusted for it.</span></label>
+                      <label class="q-opt"><input type="radio" name="d1" value="2" /><span>Yes, and we resample or reweight, and we track performance on the rare class specifically.</span></label>
+                    </div>
+                  </div>
+
+                  <div class="q" data-q="d2">
+                    <p class="qt">Has the data been checked for differences in outcomes across groups?</p>
+                    <div class="q-opts">
+                      <label class="q-opt"><input type="radio" name="d2" value="0" /><span>Not yet.</span></label>
+                      <label class="q-opt"><input type="radio" name="d2" value="1" /><span>Once, when the model was built.</span></label>
+                      <label class="q-opt"><input type="radio" name="d2" value="2" /><span>On a recurring schedule, with the results reviewed by someone outside the build team.</span></label>
+                    </div>
+                  </div>
+
+                  <div class="q" data-q="d3">
+                    <p class="qt">Do you know how your labels were produced?</p>
+                    <div class="q-opts">
+                      <label class="q-opt"><input type="radio" name="d3" value="0" /><span>They came with the dataset. We did not ask.</span></label>
+                      <label class="q-opt"><input type="radio" name="d3" value="1" /><span>An internal team labeled them, without documented guidelines.</span></label>
+                      <label class="q-opt"><input type="radio" name="d3" value="2" /><span>Documented labeling guidelines, with measured agreement between labelers.</span></label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="dim-block" data-dim="explain">
+                  <div class="dim-head">
+                    <div>
+                      <h4>2. Explainability</h4>
+                      <p class="dim-sub">Whether you can account for one decision, not just the model in general.</p>
+                    </div>
+                    <span class="dim-score" data-dimscore="explain">0 / 6</span>
+                  </div>
+
+                  <div class="q" data-q="e1">
+                    <p class="qt">Can you explain a single individual decision to the person it affected?</p>
+                    <div class="q-opts">
+                      <label class="q-opt"><input type="radio" name="e1" value="0" /><span>No.</span></label>
+                      <label class="q-opt"><input type="radio" name="e1" value="1" /><span>We can describe how the model works in general terms.</span></label>
+                      <label class="q-opt"><input type="radio" name="e1" value="2" /><span>Yes, we produce per-decision attribution such as SHAP values, in language a non-specialist can follow.</span></label>
+                    </div>
+                  </div>
+
+                  <div class="q" data-q="e2">
+                    <p class="qt">Who has asked you for that explanation so far?</p>
+                    <div class="q-opts">
+                      <label class="q-opt"><input type="radio" name="e2" value="0" /><span>Nobody, so we have not built the capability.</span></label>
+                      <label class="q-opt"><input type="radio" name="e2" value="1" /><span>Internal teams only, on an ad hoc basis.</span></label>
+                      <label class="q-opt"><input type="radio" name="e2" value="2" /><span>We assume a regulator, auditor, or affected customer will, and we built for that in advance.</span></label>
+                    </div>
+                  </div>
+
+                  <div class="q" data-q="e3">
+                    <p class="qt">If this model were swapped for a simpler, fully interpretable one, do you know what accuracy you would give up?</p>
+                    <div class="q-opts">
+                      <label class="q-opt"><input type="radio" name="e3" value="0" /><span>No comparison has been run.</span></label>
+                      <label class="q-opt"><input type="radio" name="e3" value="1" /><span>We compared once, at the start of the project.</span></label>
+                      <label class="q-opt"><input type="radio" name="e3" value="2" /><span>Yes, and we re-check the gap whenever the model is retrained.</span></label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="dim-block" data-dim="measure">
+                  <div class="dim-head">
+                    <div>
+                      <h4>3. Measurement</h4>
+                      <p class="dim-sub">Whether you would be able to prove this worked.</p>
+                    </div>
+                    <span class="dim-score" data-dimscore="measure">0 / 6</span>
+                  </div>
+
+                  <div class="q" data-q="m1">
+                    <p class="qt">What did performance look like before the model existed?</p>
+                    <div class="q-opts">
+                      <label class="q-opt"><input type="radio" name="m1" value="0" /><span>We did not measure the before state.</span></label>
+                      <label class="q-opt"><input type="radio" name="m1" value="1" /><span>We have rough numbers, gathered informally.</span></label>
+                      <label class="q-opt"><input type="radio" name="m1" value="2" /><span>A documented baseline, measured on the same metric we now report.</span></label>
+                    </div>
+                  </div>
+
+                  <div class="q" data-q="m2">
+                    <p class="qt">Which single metric decides whether this model is working?</p>
+                    <div class="q-opts">
+                      <label class="q-opt"><input type="radio" name="m2" value="0" /><span>Accuracy.</span></label>
+                      <label class="q-opt"><input type="radio" name="m2" value="1" /><span>Accuracy plus one or two others we watch alongside it.</span></label>
+                      <label class="q-opt"><input type="radio" name="m2" value="2" /><span>A metric chosen deliberately for the cost of the specific error that hurts us most.</span></label>
+                    </div>
+                  </div>
+
+                  <div class="q" data-q="m3">
+                    <p class="qt">Do you collect any signal from the people who use or are affected by the output?</p>
+                    <div class="q-opts">
+                      <label class="q-opt"><input type="radio" name="m3" value="0" /><span>No.</span></label>
+                      <label class="q-opt"><input type="radio" name="m3" value="1" /><span>Complaints reach a support inbox.</span></label>
+                      <label class="q-opt"><input type="radio" name="m3" value="2" /><span>Feedback is routed back into the evaluation data and reviewed on a schedule.</span></label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="dim-block" data-dim="govern">
+                  <div class="dim-head">
+                    <div>
+                      <h4>4. Governance &amp; Monitoring</h4>
+                      <p class="dim-sub">What happens on the day the model is wrong.</p>
+                    </div>
+                    <span class="dim-score" data-dimscore="govern">0 / 6</span>
+                  </div>
+
+                  <div class="q" data-q="g1">
+                    <p class="qt">How would you find out the model has drifted?</p>
+                    <div class="q-opts">
+                      <label class="q-opt"><input type="radio" name="g1" value="0" /><span>Someone would eventually notice the results getting worse.</span></label>
+                      <label class="q-opt"><input type="radio" name="g1" value="1" /><span>Periodic manual review of performance.</span></label>
+                      <label class="q-opt"><input type="radio" name="g1" value="2" /><span>Automated monitoring on input distributions and outcomes, with alert thresholds and a retraining trigger.</span></label>
+                    </div>
+                  </div>
+
+                  <div class="q" data-q="g2">
+                    <p class="qt">Who is accountable when the model is wrong?</p>
+                    <div class="q-opts">
+                      <label class="q-opt"><input type="radio" name="g2" value="0" /><span>Unclear, or it would be decided at the time.</span></label>
+                      <label class="q-opt"><input type="radio" name="g2" value="1" /><span>The team that built it.</span></label>
+                      <label class="q-opt"><input type="radio" name="g2" value="2" /><span>A named owner outside the build team, with the authority to pause the system.</span></label>
+                    </div>
+                  </div>
+
+                  <div class="q" data-q="g3">
+                    <p class="qt">What personal data does the model use, and does it need all of it?</p>
+                    <div class="q-opts">
+                      <label class="q-opt"><input type="radio" name="g3" value="0" /><span>We have not reviewed this.</span></label>
+                      <label class="q-opt"><input type="radio" name="g3" value="1" /><span>Reviewed once, when the system was built.</span></label>
+                      <label class="q-opt"><input type="radio" name="g3" value="2" /><span>Deliberately minimized, with anonymization or federated training used where it was practical.</span></label>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- RESULT PANEL -->
+              <div class="sc-panel">
+                <div class="sc-tag">Readiness</div>
+                <div class="sc-result">
+                  <div class="sc-score-row">
+                    <span class="sc-big" id="sc-total">0</span>
+                    <span class="sc-outof">/ 24</span>
+                  </div>
+                  <div class="sc-band" id="sc-band">
+                    Not started
+                    <small id="sc-bandsub">Answer the questions on the left.</small>
+                  </div>
+
+                  <div style="margin-top:18px;">
+                    <div class="bar-row">
+                      <div class="bar-label"><span>Data foundation</span><span class="bv" id="bv-data">0/6</span></div>
+                      <div class="bar-track"><div class="bar-fill" id="bf-data"></div></div>
+                    </div>
+                    <div class="bar-row">
+                      <div class="bar-label"><span>Explainability</span><span class="bv" id="bv-explain">0/6</span></div>
+                      <div class="bar-track"><div class="bar-fill" id="bf-explain"></div></div>
+                    </div>
+                    <div class="bar-row">
+                      <div class="bar-label"><span>Measurement</span><span class="bv" id="bv-measure">0/6</span></div>
+                      <div class="bar-track"><div class="bar-fill" id="bf-measure"></div></div>
+                    </div>
+                    <div class="bar-row">
+                      <div class="bar-label"><span>Governance &amp; monitoring</span><span class="bv" id="bv-govern">0/6</span></div>
+                      <div class="bar-track"><div class="bar-fill" id="bf-govern"></div></div>
+                    </div>
+                  </div>
+
+                  <div class="weak-callout" id="sc-weak">
+                    <strong>Weakest link:</strong> answer at least one question in each dimension to see which
+                    one is holding the project back.
+                  </div>
+
+                  <div class="sc-actions">
+                    <button class="opt-btn" id="sc-reset" type="button">Reset</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p class="sc-note">
+              The scoring is deliberately blunt. A project is treated as bounded by its weakest dimension, not
+              by its average, because that is how these systems actually fail: strong modeling does not
+              compensate for unchecked data, and a high total with one dimension near zero is a project with a
+              specific problem rather than a good project overall.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============ DIMENSIONS ============ -->
+        <section class="art-section" id="dimensions">
+          <h2>The Four Dimensions</h2>
+          <p>
+            The dimensions are not a generic maturity model. Each one is the argument an earlier artifact in
+            this portfolio was making, restated as something a team can be scored on.
+          </p>
+
+          <div class="dim-map">
+            <div class="dim-card">
+              <h4>Data Foundation</h4>
+              <p>
+                Class balance, group differences in outcomes, and the origin of the labels. These are the
+                three questions that decide whether a model has learned the task or learned the shape of the
+                dataset it was handed.
+              </p>
+              <p class="costs">
+                <strong>Cost of skipping it:</strong> a fraud model trained on a book where fraud is 0.4
+                percent of transactions can reach 99.6 percent accuracy by approving everything. The number on
+                the dashboard is excellent and the losses are unchanged.
+              </p>
+            </div>
+
+            <div class="dim-card">
+              <h4>Explainability</h4>
+              <p>
+                Not whether the team understands the architecture, but whether anyone can account for one
+                specific decision to the person on the other side of it. Per-decision attribution is a
+                capability you build in advance or do not have when you need it.
+              </p>
+              <p class="costs">
+                <strong>Cost of skipping it:</strong> under adverse-action requirements, a lender that cannot
+                say why an applicant was denied has a compliance problem, not a modeling problem. The model
+                may be correct and still be unusable.
+              </p>
+            </div>
+
+            <div class="dim-card">
+              <h4>Measurement</h4>
+              <p>
+                A documented baseline, a metric matched to the error that actually costs something, and a
+                route for feedback from the people affected. Without the first, improvement is an assertion.
+                Without the second, the metric can improve while the outcome gets worse.
+              </p>
+              <p class="costs">
+                <strong>Cost of skipping it:</strong> a trading signal or forecasting model with no
+                pre-deployment baseline cannot be defended in a budget review, because nobody can separate the
+                model's contribution from the market conditions it happened to launch into.
+              </p>
+            </div>
+
+            <div class="dim-card">
+              <h4>Governance &amp; Monitoring</h4>
+              <p>
+                Drift detection, a named owner with the authority to stop the system, and a deliberate
+                decision about how much personal data the model actually needs. This is the dimension teams
+                defer, because on day one nothing is wrong yet.
+              </p>
+              <p class="costs">
+                <strong>Cost of skipping it:</strong> covariate shift is silent. A credit or pricing model
+                degrades gradually as the customer base changes, and without monitoring the first signal is
+                usually a quarter of unexplained losses or a customer complaint that escalates.
+              </p>
+            </div>
+          </div>
+
+          <p style="margin-top:20px;">
+            The reason the scorecard caps the verdict on the weakest dimension rather than averaging is worth
+            stating plainly, because it is the single most transferable idea in this portfolio. A project that
+            scores twenty out of twenty-four with governance at one is not eighty-three percent ready. It is a
+            project that will fail in a specific, predictable way, and the score is telling you where.
+          </p>
+        </section>
+
+        <!-- ============ THROUGHLINE ============ -->
+        <section class="art-section" id="throughline">
+          <h2>The Throughline: Five Artifacts, One Argument</h2>
+          <p>
+            This portfolio was not planned as a sequence. It became one because each artifact ended with a
+            question that the next one had to answer, and the questions kept moving in the same direction:
+            away from how the technology works and toward whether a particular use of it can be trusted.
+          </p>
+
+          <div class="thread">
+            <div class="thread-item">
+              <div class="thread-num">01</div>
+              <div>
+                <h4><a href="artifact-01.html">The Evolution of AI: A Visual Timeline</a></h4>
+                <p>
+                  Traced the field across five eras, including two AI winters. The useful part was not the
+                  chronology but the pattern inside it: the winters followed periods when capability was
+                  oversold relative to what could be demonstrated.
+                </p>
+                <p class="asked">Which raised: how do you tell a real capability from an overstated one?</p>
+              </div>
+            </div>
+
+            <div class="thread-item">
+              <div class="thread-num">02</div>
+              <div>
+                <h4><a href="artifact-02.html">StudyBridge: Designing, Building, and Testing an AI Study Assistant</a></h4>
+                <p>
+                  Answered it by building one. A deployed study assistant with a defined audience, explicit
+                  academic-integrity boundaries, and adversarial testing against those boundaries. Building it
+                  made clear how much of the work is scoping and constraint rather than modeling.
+                </p>
+                <p class="asked">Which raised: how would you measure whether it actually helps real users?</p>
+              </div>
+            </div>
+
+            <div class="thread-item">
+              <div class="thread-num">03</div>
+              <div>
+                <h4><a href="artifact-03.html">Inside the Black Box: Neural Networks, Trust, and How to Measure What You Cannot See</a></h4>
+                <p>
+                  Opened the mechanism with a working neuron you operate yourself, mapped the four core
+                  architectures to business uses, and built a trust and measurement framework for systems
+                  whose reasoning cannot be inspected directly.
+                </p>
+                <p class="asked">Which raised: what does it look like when measurement and trust are absent?</p>
+              </div>
+            </div>
+
+            <div class="thread-item">
+              <div class="thread-num">04</div>
+              <div>
+                <h4><a href="artifact-04.html">Museum of AI Failures: A Walk-Through of How Machine Learning Breaks in Production</a></h4>
+                <p>
+                  Six exhibits where the visitor breaks the systems personally: skewing a training set,
+                  launching a biased hiring model, watching a recommender forget. Every failure came from the
+                  data and the surrounding process, not from the algorithm.
+                </p>
+                <p class="asked">Which raised: so how would you check a project before any of this happens?</p>
+              </div>
+            </div>
+
+            <div class="thread-item">
+              <div class="thread-num">05</div>
+              <div>
+                <h4>The Readiness Question</h4>
+                <p>
+                  The scorecard above. Twelve questions that would have caught every failure in Artifact 04
+                  before it shipped, scored against the trust framework from Artifact 03, applied to the kind
+                  of scoped, constrained build that Artifact 02 turned out to require.
+                </p>
+                <p class="asked">Which closes the sequence, at least for this course.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ LIMITATIONS ============ -->
+        <section class="art-section" id="limitations">
+          <h2>Where a Score Falls Short</h2>
+          <p>
+            A scorecard is a compression, and compressions lose things. Three limitations are worth naming
+            before anyone treats a number out of twenty-four as a verdict.
+          </p>
+          <p>
+            First, the scoring weights are a judgment, not a measurement. Twelve questions at two points each
+            treats every question as equally important, which is not true for every project. For a model that
+            never touches an individual person, such as demand forecasting for inventory, the explainability
+            dimension carries less weight than it does for credit or hiring. The dimension breakdown is more
+            informative than the total for exactly this reason.
+          </p>
+          <p>
+            Second, the scorecard is answered by the team being scored. Self-assessment is optimistic by
+            default, and the questions with the widest gap between intention and practice, particularly the
+            recurring bias review and the named accountable owner, are the easiest ones to answer generously.
+            Anything scoring above eighteen is worth having a second person answer independently.
+          </p>
+          <p>
+            Third, and most importantly, readiness is not permission. A project can score twenty-four and
+            still be a project that should not exist, because the score says nothing about whether the use
+            itself is appropriate. A well-governed, fully explainable, carefully monitored system for scoring
+            people on characteristics they cannot change is a well-built system doing something that warrants
+            a separate conversation. This tool checks whether a project is built responsibly. It does not
+            check whether it should be built.
+          </p>
+        </section>
+
+        <!-- ============ TAKEAWAY ============ -->
+        <section class="art-section" id="takeaway">
+          <h2>One-Page Takeaway</h2>
+          <p>
+            The twelve questions, the four dimensions, and the scoring bands condensed into a single page in
+            the same visual style as this site, for use in a project review, a vendor evaluation, or a
+            steering meeting where nobody wants to open a browser.
+          </p>
+          <div class="doc-actions">
+            <a class="btn btn-primary" href="assets/artifacts/ai-readiness-scorecard.pdf" download>Download the AI Readiness Scorecard (PDF)</a>
+          </div>
+        </section>
+
+        <section class="art-section" id="process">
+          <h2>Process</h2>
+          <p>
+            Started by re-reading the four prior artifacts in this portfolio and pulling out every failure
+            mode, framework, and open question they contained, then grouping them until a structure emerged.
+            The grouping collapsed cleanly into four dimensions, which was the signal that the sequence had
+            been making one argument rather than four separate ones. Drafted the twelve questions so that each
+            one is answerable by a practitioner in under fifteen seconds and has a defensible ordering between
+            its three options, then rewrote roughly half of them after finding that the first drafts asked
+            about intentions ("do you plan to monitor for drift") rather than current state, which is the
+            failure mode of most maturity assessments.
+          </p>
+          <p>
+            Built the scorecard from scratch in plain JavaScript with no frameworks and no build step,
+            matching the approach used in Artifacts 03 and 04. Chose weakest-link scoring over a simple total
+            after testing the tool against the scenarios from Artifact 04: a straight average let the cancer
+            detector scenario score respectably, which would have made the tool wrong about the exact case
+            that motivated it. Tested the interactive logic across edge cases, including partially completed
+            dimensions, ties between two equally weak dimensions, and repeated resetting. Verified the
+            finished page in a live browser with the console open rather than relying on a code review, a
+            practice adopted after peer feedback in Workshop Five identified a script-ordering bug in Artifact
+            03 that a code-level check had not caught. Finally, designed the one-page PDF version so the
+            questions survive outside the browser.
+          </p>
+        </section>
+
+        <section class="art-section" id="tools">
+          <h2>Tools &amp; Technologies</h2>
+          <p>
+            HTML / CSS / JavaScript (no frameworks, no build step) &middot; Python with Pillow and ReportLab
+            for the cover image and the downloadable one-page PDF &middot; Git and GitHub Pages for version
+            control and hosting &middot; Chrome DevTools console for live verification &middot; AIML-500
+            course materials across all five workshops &middot; Claude (Anthropic) for structure and code
+            assistance.
+          </p>
+        </section>
+
+        <section class="art-section" id="value">
+          <h2>Value Proposition</h2>
+          <p>
+            Most AI readiness material is written for organizations rather than projects, and arrives as a
+            consulting framework with maturity levels that take a workshop to apply. This is twelve questions
+            and about three minutes, aimed at one specific project, producing a named weakest dimension and a
+            concrete next step rather than a maturity tier. For finance professionals and strategy leaders
+            evaluating a vendor tool or an internal build, the questions are deliberately the ones that are
+            uncomfortable to answer honestly, because those are the ones that predict what happens after
+            launch.
+          </p>
+        </section>
+
+        <section class="art-section" id="unique">
+          <h2>Unique Value</h2>
+          <p>
+            Two things separate this from a generic checklist. The first is the weakest-link rule. Almost
+            every readiness framework averages its dimensions, which produces a comfortable middling score for
+            a project with one catastrophic gap. This one refuses to, and says so on the page, because the
+            failures documented in Artifact 04 were all single-dimension failures inside otherwise competent
+            projects.
+          </p>
+          <p>
+            The second is that every dimension is traceable to something demonstrated elsewhere in this
+            portfolio rather than asserted here. A visitor who scores low on data foundation can go break a
+            class-imbalanced classifier in Artifact 04 and see the mechanism, then come back. The scorecard
+            is the index to four artifacts of worked examples, which is a different thing from a checklist
+            that asks you to take its word for it.
+          </p>
+        </section>
+
+        <section class="art-section" id="relevance">
+          <h2>Relevance</h2>
+          <p>
+            The gap this addresses is widening rather than closing. Model capability is increasingly available
+            as a purchased service, which means the differentiator for most organizations is no longer whether
+            they can build a model but whether they can tell a deployable one from a liability. That judgment
+            sits with people who are not the modelers: risk officers, product owners, heads of function,
+            people approving a budget line.
+          </p>
+          <p>
+            In finance specifically, the four dimensions map onto obligations that already exist. Data
+            foundation and governance overlap with model risk management expectations. Explainability overlaps
+            with adverse-action notice requirements in lending. Measurement is what a model validation
+            function asks for. The scorecard does not replace any of those processes, but it gives someone
+            without a modeling background a structured way to ask the first round of questions before a formal
+            review begins, which is the point in the timeline where a project is still cheap to change.
+          </p>
+        </section>
+
+        <section class="art-section" id="learnings">
+          <h2>Key Learnings</h2>
+          <ul>
+            <li>Building a synthesis forced a claim the individual artifacts had only implied. Grouping four artifacts of material into four dimensions was straightforward. Deciding that the weakest dimension caps the verdict was not, and that single decision is what makes the tool say something rather than describe something.</li>
+            <li>Questions about current state are far harder to write than questions about intent, and much more useful. The first draft asked what teams plan to do, which every team answers well. Rewriting toward what is true today made several questions uncomfortable, which was the correct outcome.</li>
+            <li>A bug that a code review missed and a peer caught changed how I verify work. The script-ordering error in Artifact 03 failed in every browser, every time, and passed a syntax check cleanly. Loading the page in a real browser with the console open is now the acceptance test, not the final formality.</li>
+            <li>Writing the limitations section was the part that clarified the tool most. Naming that readiness is not permission, and that a well-governed system can still be doing something that warrants a separate conversation, drew a boundary around what a scorecard can honestly claim.</li>
+            <li>Across five artifacts, the consistent finding is that the interesting problems in machine learning are rarely in the model. They are in the data, the measurement, and the question of who is accountable, which is also why this material transfers to people who will never train anything.</li>
+          </ul>
+        </section>
+
+        <section class="art-section" id="references">
+          <h2>References</h2>
+          <ul class="ref-list">
+            <li>AIML-500 Machine Learning Fundamentals course materials, Workshops One through Five: AI history and eras, generative AI and prompt design, deep learning architectures, data challenges in machine learning.</li>
+            <li>Data Challenge Scenarios Coach transcript, AIML-500 (class imbalance in a cancer classifier, covariate shift in a recommendation engine, explainability in a credit model), used as the source for Artifact 04 and revisited here to test the scoring logic.</li>
+            <li>Prior artifacts in this portfolio, used as the source material for the four dimensions:
+              <a href="artifact-01.html">Artifact 01</a>, <a href="artifact-02.html">Artifact 02</a>,
+              <a href="artifact-03.html">Artifact 03</a>, <a href="artifact-04.html">Artifact 04</a>.</li>
+            <li>Peer feedback received in Workshop Five, which identified a rendering bug in the Artifact 03 neuron playground and prompted the Skills &amp; Tools overview now on the <a href="about.html">About</a> page.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div>&copy; 2026 Moya Kramo &middot; Data Science &amp; AI</div>
+      <div><a href="artifacts.html">All artifacts</a> &middot; <a href="index.html">Home</a></div>
+    </div>
+  </footer>
+
+  <script src="assets/main.js"></script>
+  <script>
+  // ============================================================
+  // AI Readiness Scorecard. Plain JavaScript, no libraries.
+  // Twelve questions, four dimensions, three points bands.
+  // Scoring is bounded by the weakest dimension, not the average.
+  // ============================================================
+  (function () {
+    var root = document.getElementById('sc-questions');
+    if (!root) return;
+
+    // Dimension metadata. Declared before any function that reads it.
+    var DIMS = ['data', 'explain', 'measure', 'govern'];
+
+    var LABELS = {
+      data:    'Data foundation',
+      explain: 'Explainability',
+      measure: 'Measurement',
+      govern:  'Governance and monitoring'
+    };
+
+    var ADVICE = {
+      data: {
+        step: 'Before anything else, pull the class balance of your training data and the outcome rates by group. Both are a query, not a project.',
+        link: 'artifact-04.html#exhibit-imbalance',
+        linkText: 'See what an unchecked imbalance does in Exhibit 01'
+      },
+      explain: {
+        step: 'Pick one real decision the model made last week and try to write the explanation you would give the person it affected. Whatever you cannot write is the gap.',
+        link: 'artifact-04.html#exhibit-explainability',
+        linkText: 'See per-decision attribution in Exhibit 05'
+      },
+      measure: {
+        step: 'Write down the pre-model baseline and the one error that costs you the most. If the baseline does not exist yet, capture it before the model ships, because it cannot be reconstructed afterward.',
+        link: 'artifact-03.html#trust',
+        linkText: 'See the trust and measurement framework in Artifact 03'
+      },
+      govern: {
+        step: 'Name the person who can pause this system, and decide today what change in the inputs would tell you it has drifted.',
+        link: 'artifact-04.html#exhibit-drift',
+        linkText: 'See how quietly drift arrives in Exhibit 02'
+      }
+    };
+
+    // Which questions belong to which dimension.
+    var GROUPS = {
+      data:    ['d1', 'd2', 'd3'],
+      explain: ['e1', 'e2', 'e3'],
+      measure: ['m1', 'm2', 'm3'],
+      govern:  ['g1', 'g2', 'g3']
+    };
+
+    var els = {
+      total: document.getElementById('sc-total'),
+      band: document.getElementById('sc-band'),
+      bandsub: document.getElementById('sc-bandsub'),
+      weak: document.getElementById('sc-weak'),
+      reset: document.getElementById('sc-reset')
+    };
+
+    function scoreOf(name) {
+      var picked = root.querySelector('input[name="' + name + '"]:checked');
+      return picked ? parseInt(picked.value, 10) : null;
+    }
+
+    function dimTotals() {
+      var out = {};
+      DIMS.forEach(function (d) {
+        var sum = 0, answered = 0;
+        GROUPS[d].forEach(function (q) {
+          var v = scoreOf(q);
+          if (v !== null) { sum += v; answered++; }
+        });
+        out[d] = { sum: sum, answered: answered, complete: answered === GROUPS[d].length };
+      });
+      return out;
+    }
+
+    function bandFor(total, minDim, allComplete) {
+      if (!allComplete) {
+        return {
+          name: 'In progress',
+          sub: 'Answer all twelve questions for a readiness band.'
+        };
+      }
+      // Weakest-link rule: a near-empty dimension caps the verdict regardless of total.
+      if (minDim <= 1) {
+        return {
+          name: 'Not ready',
+          sub: 'One dimension is close to empty. The total does not matter until that is addressed.'
+        };
+      }
+      if (total <= 9) {
+        return {
+          name: 'Not ready',
+          sub: 'This project would fail on its conditions rather than its modeling. Treat the weakest dimension as the first piece of work.'
+        };
+      }
+      if (total <= 15) {
+        return {
+          name: 'Early',
+          sub: 'Enough is in place to build, not enough to deploy where a wrong answer reaches a person or a balance sheet.'
+        };
+      }
+      if (total <= 20) {
+        return {
+          name: 'Approaching',
+          sub: 'Deployable with a defined scope and a monitoring plan. Close the weakest dimension before widening that scope.'
+        };
+      }
+      if (minDim <= 3) {
+        return {
+          name: 'Approaching',
+          sub: 'A strong total, but one dimension is lagging the rest. Address it before treating this as production-ready.'
+        };
+      }
+      return {
+        name: 'Production-ready',
+        sub: 'Conditions are in place. Readiness is not permanent, so re-score after any retraining or change of scope.'
+      };
+    }
+
+    function setBar(dim, sum, complete) {
+      var fill = document.getElementById('bf-' + dim);
+      var val = document.getElementById('bv-' + dim);
+      if (!fill || !val) return;
+      fill.style.width = ((sum / 6) * 100) + '%';
+      fill.className = 'bar-fill' + (complete && sum >= 5 ? ' good' : (complete && sum <= 2 ? ' weak' : ''));
+      val.textContent = sum + '/6';
+      var chip = root.querySelector('[data-dimscore="' + dim + '"]');
+      if (chip) chip.textContent = sum + ' / 6';
+    }
+
+    function update() {
+      var totals = dimTotals();
+      var total = 0, minDim = Infinity, allComplete = true, weakest = null, tied = false;
+
+      DIMS.forEach(function (d) {
+        total += totals[d].sum;
+        if (!totals[d].complete) allComplete = false;
+        setBar(d, totals[d].sum, totals[d].complete);
+      });
+
+      DIMS.forEach(function (d) {
+        if (!totals[d].complete) return;
+        if (totals[d].sum < minDim) { minDim = totals[d].sum; weakest = d; tied = false; }
+        else if (totals[d].sum === minDim && weakest !== null && d !== weakest) { tied = true; }
+      });
+      if (weakest === null) minDim = 0; // no dimension is fully answered yet
+
+      els.total.textContent = total;
+
+      var band = bandFor(total, minDim, allComplete);
+      els.band.childNodes[0].nodeValue = band.name + ' ';
+      els.bandsub.textContent = band.sub;
+
+      if (weakest === null) {
+        els.weak.innerHTML = '<strong>Weakest link:</strong> answer at least one full dimension to see which ' +
+          'one is holding the project back.';
+        return;
+      }
+
+      // Every completed dimension is at full marks, so there is no weak link to name.
+      if (minDim === 6) {
+        els.weak.innerHTML = '<strong>No weak dimension.</strong> Every dimension answered is at 6 of 6. ' +
+          'Worth having a second person answer this independently, since self-assessment runs optimistic, ' +
+          'and worth re-scoring after the next retraining or change of scope.';
+        return;
+      }
+
+      var a = ADVICE[weakest];
+      var tieNote = tied ? ' (tied with another dimension at the same score)' : '';
+      els.weak.innerHTML =
+        '<strong>Weakest link: ' + LABELS[weakest] + ', ' + minDim + ' of 6' + tieNote + '.</strong> ' +
+        a.step + ' <a href="' + a.link + '">' + a.linkText + ' &rarr;</a>';
+    }
+
+    // Visual state on the selected option, plus recalculation.
+    root.addEventListener('change', function (ev) {
+      var input = ev.target;
+      if (!input || input.type !== 'radio') return;
+      var group = root.querySelectorAll('input[name="' + input.name + '"]');
+      Array.prototype.forEach.call(group, function (r) {
+        var lab = r.closest('.q-opt');
+        if (lab) lab.classList.toggle('on', r.checked);
+      });
+      update();
+    });
+
+    if (els.reset) {
+      els.reset.addEventListener('click', function () {
+        var all = root.querySelectorAll('input[type="radio"]');
+        Array.prototype.forEach.call(all, function (r) {
+          r.checked = false;
+          var lab = r.closest('.q-opt');
+          if (lab) lab.classList.remove('on');
+        });
+        update();
+      });
+    }
+
+    update();
+  })();
+  </script>
+</body>
+</html>

@@ -9,6 +9,29 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    /* Scoped styles for the Skills & Tools grid. Uses the site's design tokens. */
+    .skill-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    }
+    @media (max-width: 980px) { .skill-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .skill-grid { grid-template-columns: 1fr; } }
+    .skill-card {
+      background: var(--surface); border: 1px solid var(--border-soft);
+      border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow);
+    }
+    .skill-card h3 {
+      margin: 0 0 12px; font-size: .98rem; color: var(--text); letter-spacing: .2px;
+    }
+    .skill-card .pills { margin-bottom: 0; }
+    .skill-card p {
+      margin: 12px 0 0; font-size: 13px; color: var(--muted-2); line-height: 1.6;
+    }
+    .section-head h2 .accent {
+      background: var(--grad);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -36,6 +59,31 @@
           By combining analytical thinking from finance with a deep interest in AI and machine learning, I
           translate technical concepts into practical knowledge that helps people make smarter decisions.
         </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="kicker">Professional bio</div>
+          <h2>Who I am</h2>
+        </div>
+        <div class="statement">
+          <p>
+            I am Moya Kramo. My background is in finance and trading, where the work is fundamentally about
+            making decisions under uncertainty with incomplete information, and where being confidently wrong
+            is expensive. That is the lens I bring to artificial intelligence and machine learning, which is
+            now my primary area of study and the focus of everything on this site.
+          </p>
+          <p>
+            The through-line of my work is translation. Markets taught me to separate a real signal from a
+            well-told story, and the same discipline applies to AI: distinguishing a demonstrated capability
+            from a claimed one, and knowing which questions expose the difference. My aim is to keep building
+            resources that let people who are not machine learning engineers evaluate these systems
+            competently, because that judgment increasingly sits with product owners, risk functions, and
+            executives rather than with the people writing the models.
+          </p>
+        </div>
       </div>
     </section>
 
@@ -83,6 +131,81 @@
             <span class="accent">meaningful value</span>, and how to apply it with confidence. My goal is to
             replace confusion and hype with clarity, practical insight, and informed decision-making.
           </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="kicker">Skills &amp; tools</div>
+          <h2>What I <span class="accent">build with</span></h2>
+          <p>
+            The stack behind the five artifacts on this site. Every interactive component was written by hand
+            in plain JavaScript, with no frameworks and no build step, so that each moving part stays legible.
+          </p>
+        </div>
+        <div class="skill-grid">
+          <div class="skill-card">
+            <h3>Languages &amp; markup</h3>
+            <div class="pills">
+              <span class="pill">JavaScript (ES5 / ES6)</span>
+              <span class="pill">Python</span>
+              <span class="pill">HTML5</span>
+              <span class="pill">CSS3</span>
+            </div>
+          </div>
+          <div class="skill-card">
+            <h3>Python libraries</h3>
+            <div class="pills">
+              <span class="pill">Pillow</span>
+              <span class="pill">ReportLab</span>
+            </div>
+            <p>Used to generate the cover images and the downloadable one-page guides for each artifact.</p>
+          </div>
+          <div class="skill-card">
+            <h3>Interface &amp; visualization</h3>
+            <div class="pills">
+              <span class="pill">HTML Canvas 2D API</span>
+              <span class="pill">CSS Grid &amp; Flexbox</span>
+              <span class="pill">Responsive layout</span>
+              <span class="pill">Scrollspy navigation</span>
+            </div>
+            <p>The neuron simulator, the six failure exhibits, and the readiness scorecard are all hand-built.</p>
+          </div>
+          <div class="skill-card">
+            <h3>Machine learning concepts applied</h3>
+            <div class="pills">
+              <span class="pill">Neural architectures (ANN, CNN, RNN, GAN)</span>
+              <span class="pill">Activation functions</span>
+              <span class="pill">Class imbalance</span>
+              <span class="pill">Data drift</span>
+              <span class="pill">SHAP explainability</span>
+              <span class="pill">Bias auditing</span>
+              <span class="pill">Federated learning</span>
+            </div>
+          </div>
+          <div class="skill-card">
+            <h3>AI tools &amp; platforms</h3>
+            <div class="pills">
+              <span class="pill">Chatbase</span>
+              <span class="pill">Claude</span>
+              <span class="pill">ChatGPT &amp; custom GPTs</span>
+              <span class="pill">STORM</span>
+              <span class="pill">System prompt design</span>
+              <span class="pill">Prompt engineering</span>
+            </div>
+          </div>
+          <div class="skill-card">
+            <h3>Workflow &amp; delivery</h3>
+            <div class="pills">
+              <span class="pill">Git &amp; GitHub</span>
+              <span class="pill">GitHub Pages</span>
+              <span class="pill">Chrome DevTools</span>
+              <span class="pill">Design thinking</span>
+              <span class="pill">PowerPoint</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>

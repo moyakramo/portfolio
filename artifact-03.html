@@ -115,6 +115,7 @@
         <a class="back" href="artifacts.html">&larr; Back to Artifacts</a>
         <ul>
           <li><a href="#introduction" class="active">Introduction</a></li>
+          <li><a href="#description">Description</a></li>
           <li><a href="#objective">Objective</a></li>
           <li><a href="#playground">Neuron Playground</a></li>
           <li><a href="#architectures">Four Architectures</a></li>
@@ -124,7 +125,10 @@
           <li><a href="#process">Process</a></li>
           <li><a href="#tools">Tools &amp; Technologies</a></li>
           <li><a href="#value">Value Proposition</a></li>
+          <li><a href="#unique">Unique Value</a></li>
+          <li><a href="#relevance">Relevance</a></li>
           <li><a href="#learnings">Key Learnings</a></li>
+          <li><a href="#references">References</a></li>
         </ul>
       </aside>
 
@@ -165,6 +169,25 @@
             takes both halves seriously: first the mechanics, made tangible through an interactive widget and
             plain-English architecture profiles, and then the harder question of how to trust and measure a
             system you cannot see inside.
+          </p>
+        </section>
+
+        <section class="art-section" id="description">
+          <h2>Description</h2>
+          <p>
+            This artifact has four parts. The first is the Neuron Playground, a working single artificial
+            neuron built from scratch on an HTML canvas: five sliders control the two inputs, their weights,
+            and the bias, and three buttons switch between sigmoid, ReLU, and tanh activation. The diagram and
+            the output redraw live as the values change, so the arithmetic of a neuron becomes something the
+            visitor operates rather than reads.
+          </p>
+          <p>
+            The second part profiles the four architectures a decision-maker is most likely to encounter,
+            ANNs, CNNs, RNNs, and GANs, each mapped to a business or finance use rather than described in the
+            abstract, with a callout on deepfake risk attached to the GAN card. The third is a trust and
+            measurement framework for systems whose reasoning cannot be inspected, demonstrated on the live
+            StudyBridge assistant from Artifact 02 rather than on a hypothetical. The fourth is a downloadable
+            Neural Networks Field Guide condensing all of it into one page.
           </p>
         </section>
 
@@ -427,6 +450,37 @@
           </p>
         </section>
 
+        <section class="art-section" id="unique">
+          <h2>Unique Value</h2>
+          <p>
+            Interactive neuron demos exist. What is unusual here is the pairing: the same page that makes the
+            mechanism transparent then argues that transparency does not scale, and hands over a measurement
+            framework as the practical substitute. The playground is not decoration for the framework, it is
+            the argument for it. Once a visitor has personally tuned five parameters and seen how much the
+            output moves, the claim that nobody can read a billion tuned weights stops being an assertion and
+            becomes obvious.
+          </p>
+          <p>
+            The framework is also applied rather than proposed. The four metrics are worked through against
+            StudyBridge, a chatbot the reader can still open and test, which keeps the evaluation concrete
+            instead of generic.
+          </p>
+        </section>
+
+        <section class="art-section" id="relevance">
+          <h2>Relevance</h2>
+          <p>
+            Deep learning now sits behind fraud scoring, credit decisions, document processing, and the
+            assistants appearing across financial services, and in almost none of those cases can the buyer
+            inspect the reasoning. That makes the question in this artifact the operative one for anyone
+            procuring or approving such a system: if you cannot look inside, what evidence would justify
+            trusting it? The four questions developed here, covering refusal rate, consistency, task
+            completion, and user trust, are portable to any vendor conversation, and the section on explaining
+            explainability to a non-technical audience addresses the practical follow-on problem of defending
+            that judgment to people who will never see a weight.
+          </p>
+        </section>
+
         <section class="art-section" id="learnings">
           <h2>Key Learnings</h2>
           <ul>
@@ -435,6 +489,18 @@
             <li>Interpretability and capability pull in opposite directions. The models easiest to explain are often the least powerful, which is why measurement, not inspection, has to carry the weight of trust in practice.</li>
             <li>Evaluation is a design activity, not an afterthought. Defining the four StudyBridge metrics changed how I would build the assistant itself: instrumenting refusals and plan completion from day one instead of bolting measurement on later.</li>
             <li>Building the widget without frameworks was a deliberate constraint. Writing the rendering and math by hand made every moving part of the neuron legible, which is the point of the exercise.</li>
+            <li>A code review is not a test. Peer feedback in Workshop Five identified that the playground was not rendering for visitors, caused by a script-ordering error that passed a syntax check cleanly and failed in every browser. Loading the page in a live browser with the console open is now part of finishing any interactive work.</li>
+          </ul>
+        </section>
+
+        <section class="art-section" id="references">
+          <h2>References</h2>
+          <ul>
+            <li>AIML-500 Machine Learning Fundamentals, Workshop Three course materials on deep learning and neural network architectures.</li>
+            <li>Artifact 02 of this portfolio, <a href="artifact-02.html" style="color:var(--red-bright)">StudyBridge</a>, used as the live case study for the measurement framework.</li>
+            <li>Downloadable companion:
+              <a href="assets/artifacts/neural-networks-field-guide.pdf" style="color:var(--red-bright)">Neural Networks Field Guide (PDF)</a>.</li>
+            <li>Peer feedback received in Workshop Five, which identified the rendering bug noted in Key Learnings.</li>
           </ul>
         </section>
       </div>
@@ -481,6 +547,13 @@
       }
     };
 
+    // theme colors (match assets/style.css tokens)
+    var C = {
+      text: '#f4eef0', muted: '#b39aa1', muted2: '#8b757c',
+      pos: '#e63950', neg: '#5f7ea0', node: '#22161a',
+      border: '#3a2329', grad0: '#7a1526', grad1: '#d6294a'
+    };
+
     // wire controls
     function bind(id, key) {
       var el = document.getElementById('ctl-' + id);
@@ -507,13 +580,6 @@
         draw();
       });
     });
-
-    // theme colors (match assets/style.css tokens)
-    var C = {
-      text: '#f4eef0', muted: '#b39aa1', muted2: '#8b757c',
-      pos: '#e63950', neg: '#5f7ea0', node: '#22161a',
-      border: '#3a2329', grad0: '#7a1526', grad1: '#d6294a'
-    };
 
     function compute() {
       var z = state.w1 * state.x1 + state.w2 * state.x2 + state.b;
